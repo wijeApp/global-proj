@@ -1,7 +1,6 @@
 package com.tas.global.globalven.config;
 
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,14 +15,13 @@ public class DatabaseConfig {
     /**
      * MySQL DataSource - Primary database for all JPA entities (users, employees, etc.)
      * This is the @Primary datasource for Spring Boot auto-configuration
-     */
-    @Bean("mysqlDataSource")
+     */    @Bean("mysqlDataSource")
     @Primary
     public DataSource mysqlDataSource() {
         return DataSourceBuilder.create()
-                .url("jdbc:mysql://localhost:3306/globalschema?useSSL=false&serverTimezone=UTC&createDatabaseIfNotExist=true")
-                .username("sa")
-                .password("myRoot@123")
+                .url("jdbc:mysql://centerbeam.proxy.rlwy.net:44701/globalschema?useSSL=false&serverTimezone=UTC&createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8")
+                .username("root")
+                .password("nRVPeDdzWcGLkBTOmgsndBJhwZCGrjuP")
                 .driverClassName("com.mysql.cj.jdbc.Driver")
                 .build();
     }
