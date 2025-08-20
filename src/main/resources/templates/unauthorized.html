@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<!-- You are not Allow Access This Page -->
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Access Denied - GlobalVen</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .unauthorized-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 3rem;
+            text-align: center;
+            max-width: 600px;
+            margin: 2rem;
+        }
+        
+        .unauthorized-icon {
+            font-size: 6rem;
+            color: #dc3545;
+            margin-bottom: 1.5rem;
+            animation: shake 1s ease-in-out;
+        }
+        
+        @keyframes shake {
+            0%, 20%, 40%, 60%, 80% {
+                transform: translateX(0);
+            }
+            10%, 30%, 50%, 70%, 90% {
+                transform: translateX(-5px);
+            }
+        }
+        
+        .unauthorized-title {
+            color: #2c3e50;
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+        
+        .unauthorized-subtitle {
+            color: #7f8c8d;
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .unauthorized-message {
+            background-color: #f8f9fa;
+            border-left: 4px solid #dc3545;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 0 10px 10px 0;
+        }
+        
+        .unauthorized-message h5 {
+            color: #dc3545;
+            margin-bottom: 1rem;
+        }
+        
+        .unauthorized-message p {
+            color: #495057;
+            margin-bottom: 0.5rem;
+        }
+        
+        .action-buttons {
+            margin-top: 2rem;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-outline-secondary {
+            border: 2px solid #6c757d;
+            padding: 0.8rem 2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-outline-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(108, 117, 125, 0.2);
+        }
+        
+        .contact-info {
+            background-color: #e3f2fd;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .contact-info h6 {
+            color: #1565c0;
+            margin-bottom: 1rem;
+        }
+        
+        .contact-info p {
+            color: #424242;
+            margin-bottom: 0.5rem;
+        }
+        
+        .navbar-brand {
+            color: white !important;
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+        
+        .error-code {
+            background: linear-gradient(135deg, #ff6b6b, #feca57);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 4rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+        
+        .breadcrumb-container {
+            position: absolute;
+            top: 2rem;
+            left: 2rem;
+            right: 2rem;
+        }
+        
+        .breadcrumb {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 50px;
+            padding: 0.5rem 1rem;
+        }
+        
+        .breadcrumb-item a {
+            color: white;
+            text-decoration: none;
+        }
+        
+        .breadcrumb-item.active {
+            color: rgba(255, 255, 255, 0.8);
+        }
+    </style>
+</head>
+<body>
+    <!-- Breadcrumb Navigation -->
+    <div class="breadcrumb-container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item">
+                    <a href="/" class="text-white">
+                        <i class="bi bi-house-door"></i> Home
+                    </a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page">
+                    <i class="bi bi-shield-exclamation"></i> Access Denied
+                </li>
+            </ol>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="unauthorized-container">
+        <!-- Error Icon and Code -->
+        <div class="unauthorized-icon">
+            <i class="bi bi-shield-exclamation"></i>
+        </div>
+        
+        <div class="error-code">403</div>
+        
+        <!-- Title and Subtitle -->
+        <h1 class="unauthorized-title">Access Denied</h1>
+        <p class="unauthorized-subtitle">You are not Allow Access This Page</p>
+        
+        <!-- Error Message -->
+        <div class="unauthorized-message">
+            <h5><i class="bi bi-exclamation-triangle-fill"></i> 
+                <span th:text="${resource != null ? resource.replace('-', ' ').toUpperCase() + ' Access Restricted' : 'System Access Restricted'}">
+                    User Management Access Restricted
+                </span>
+            </h5>
+            <p><strong>Reason:</strong> 
+                <span th:text="${errorMessage != null ? errorMessage : 'Insufficient privileges to access this resource'}">
+                    Insufficient privileges to access User Management system
+                </span>
+            </p>
+            <p><strong>Required Roles:</strong> 
+                <span th:if="${requiredRoles != null}">
+                    <span th:each="role, iterStat : ${requiredRoles}">
+                        <span th:text="${role.toString().replace('_', ' ')}" class="badge bg-primary me-1"></span>
+                    </span>
+                </span>
+                <span th:if="${requiredRoles == null}">Administrator, Super Administrator, or HR</span>
+            </p>
+            <p><strong>Your Current Role:</strong> 
+                <span th:text="${userRole != null ? userRole.replace('_', ' ') : 'Guest User'}" 
+                      th:class="${userRole != null and userRole != 'GUEST' ? 'badge bg-warning' : 'badge bg-secondary'}"
+                      id="userStatus">Guest User</span>
+            </p>
+            <p><strong>Access Level:</strong> 
+                <span th:text="${userRole != null and userRole != 'GUEST' ? 'Limited' : 'None'}" 
+                      id="accessLevel">Limited</span>
+            </p>
+        </div>
+        
+        <!-- Additional Information -->
+        <div class="alert alert-warning" role="alert">
+            <i class="bi bi-info-circle-fill"></i>
+            <strong>Note:</strong> You are not Allow Access This Page. Please contact your system administrator for proper access permissions.
+        </div>
+        
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            <a href="/" class="btn btn-primary me-3">
+                <i class="bi bi-house-door"></i> Go to Homepage
+            </a>
+            <button onclick="history.back()" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Go Back
+            </button>
+        </div>
+        
+        <!-- Contact Information -->
+        <div class="contact-info">
+            <h6><i class="bi bi-person-lines-fill"></i> Need Access?</h6>
+            <p><i class="bi bi-envelope"></i> Contact your system administrator</p>
+            <p><i class="bi bi-telephone"></i> Request role upgrade through HR department</p>
+            <p><i class="bi bi-clock"></i> Access requests are typically processed within 24-48 hours</p>
+        </div>
+        
+        <!-- Additional Actions -->
+        <div class="mt-4">
+            <h6 class="text-muted mb-3">What you can do:</h6>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card border-0 bg-light">
+                        <div class="card-body text-center">
+                            <i class="bi bi-person-check text-success" style="font-size: 2rem;"></i>
+                            <h6 class="card-title mt-2">Login</h6>
+                            <p class="card-text small">Sign in with proper credentials</p>
+                            <a href="/login" class="btn btn-sm btn-outline-success">
+                                <i class="bi bi-box-arrow-in-right"></i> Login
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-0 bg-light">
+                        <div class="card-body text-center">
+                            <i class="bi bi-question-circle text-info" style="font-size: 2rem;"></i>
+                            <h6 class="card-title mt-2">Get Help</h6>
+                            <p class="card-text small">Contact system support</p>
+                            <a href="/about" class="btn btn-sm btn-outline-info">
+                                <i class="bi bi-info-circle"></i> Help
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-0 bg-light">
+                        <div class="card-body text-center">
+                            <i class="bi bi-arrow-clockwise text-warning" style="font-size: 2rem;"></i>
+                            <h6 class="card-title mt-2">Try Again</h6>
+                            <p class="card-text small">Refresh and retry access</p>
+                            <button onclick="location.reload()" class="btn btn-sm btn-outline-warning">
+                                <i class="bi bi-arrow-clockwise"></i> Refresh
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- System Information -->
+        <div class="mt-4 pt-3 border-top">
+            <small class="text-muted">
+                <i class="bi bi-shield-check"></i> GlobalVen Security System | 
+                Error Code: 403-USER-MGMT | 
+                <span id="timestamp"></span>
+            </small>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Set current timestamp
+        document.getElementById('timestamp').textContent = new Date().toLocaleString();
+        
+        // Try to get user information from session/localStorage if available
+        function updateUserInfo() {
+            // This would typically come from your authentication system
+            // For now, we'll show default values
+            const userStatus = localStorage.getItem('userRole') || 'Guest User';
+            const accessLevel = localStorage.getItem('accessLevel') || 'Limited';
+            
+            document.getElementById('userStatus').textContent = userStatus;
+            document.getElementById('accessLevel').textContent = accessLevel;
+        }
+        
+        // Update user info on page load
+        document.addEventListener('DOMContentLoaded', updateUserInfo);
+        
+        // Add some interactive effects
+        document.querySelectorAll('.btn').forEach(btn => {
+            btn.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-2px)';
+            });
+            
+            btn.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+        
+        // Auto-redirect after 30 seconds (optional)
+        let countdown = 30;
+        const countdownElement = document.createElement('div');
+        countdownElement.className = 'mt-3 text-muted';
+        countdownElement.innerHTML = `<small><i class="bi bi-clock"></i> Auto-redirecting to homepage in <span id="countdown">${countdown}</span> seconds</small>`;
+        
+        // Uncomment the following lines if you want auto-redirect
+        /*
+        document.querySelector('.unauthorized-container').appendChild(countdownElement);
+        
+        const timer = setInterval(() => {
+            countdown--;
+            document.getElementById('countdown').textContent = countdown;
+            
+            if (countdown <= 0) {
+                clearInterval(timer);
+                window.location.href = '/';
+            }
+        }, 1000);
+        */
+    </script>
+</body>
+</html>

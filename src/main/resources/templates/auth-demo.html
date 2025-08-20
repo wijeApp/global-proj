@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authorization Demo - GlobalVen</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    
+    <style>
+        .role-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+        
+        .role-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            border-color: #007bff;
+        }
+        
+        .role-card.selected {
+            border-color: #28a745;
+            background-color: #f8fff9;
+        }
+        
+        .demo-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 3rem 0;
+            margin-bottom: 2rem;
+        }
+        
+        .test-button {
+            margin: 0.5rem;
+            min-width: 200px;
+        }
+        
+        .result-box {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+            min-height: 100px;
+            border: 2px dashed #dee2e6;
+        }
+        
+        .success-result {
+            border-color: #28a745;
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .error-result {
+            border-color: #dc3545;
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Menu -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-building"></i> GlobalVen
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">
+                            <i class="bi bi-house-door"></i> Home
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/auth-demo">
+                            <i class="bi bi-shield-check"></i> Authorization Demo
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Demo Header -->
+    <div class="demo-section">
+        <div class="container text-center">
+            <h1><i class="bi bi-shield-check"></i> Authorization Demo</h1>
+            <p class="lead">Test the user management authorization system by selecting different roles</p>
+        </div>
+    </div>
+
+    <!-- Content Section -->
+    <section class="content-section">
+        <div class="container">
+            <!-- Role Selection -->
+            <div class="row mb-5">
+                <div class="col-12">
+                    <h3 class="mb-4"><i class="bi bi-person-gear"></i> Select Your Role</h3>
+                    <p class="text-muted mb-4">Choose a role to simulate and test access permissions</p>
+                    
+                    <div class="row">
+                        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+                            <div class="card role-card h-100" onclick="selectRole('GUEST')">
+                                <div class="card-body text-center">
+                                    <i class="bi bi-person text-secondary" style="font-size: 2rem;"></i>
+                                    <h6 class="card-title mt-2">Guest</h6>
+                                    <small class="text-muted">No Access</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+                            <div class="card role-card h-100" onclick="selectRole('USER')">
+                                <div class="card-body text-center">
+                                    <i class="bi bi-person-fill text-info" style="font-size: 2rem;"></i>
+                                    <h6 class="card-title mt-2">User</h6>
+                                    <small class="text-muted">Basic Access</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+                            <div class="card role-card h-100" onclick="selectRole('FINANCE')">
+                                <div class="card-body text-center">
+                                    <i class="bi bi-currency-dollar text-primary" style="font-size: 2rem;"></i>
+                                    <h6 class="card-title mt-2">Finance</h6>
+                                    <small class="text-muted">Financial Access</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+                            <div class="card role-card h-100" onclick="selectRole('MANAGER')">
+                                <div class="card-body text-center">
+                                    <i class="bi bi-person-badge text-warning" style="font-size: 2rem;"></i>
+                                    <h6 class="card-title mt-2">Manager</h6>
+                                    <small class="text-muted">Management Access</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+                            <div class="card role-card h-100" onclick="selectRole('HR')">
+                                <div class="card-body text-center">
+                                    <i class="bi bi-people-fill text-success" style="font-size: 2rem;"></i>
+                                    <h6 class="card-title mt-2">HR</h6>
+                                    <small class="text-muted">HR Access</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+                            <div class="card role-card h-100" onclick="selectRole('ADMIN')">
+                                <div class="card-body text-center">
+                                    <i class="bi bi-shield-fill text-danger" style="font-size: 2rem;"></i>
+                                    <h6 class="card-title mt-2">Admin</h6>
+                                    <small class="text-muted">Full Access</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Current Role Display -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="alert alert-info" role="alert">
+                        <i class="bi bi-info-circle-fill"></i>
+                        <strong>Current Role:</strong> <span id="currentRole" class="badge bg-secondary">None Selected</span>
+                        <span id="roleDescription" class="ms-2"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Test Buttons -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h4 class="mb-3"><i class="bi bi-play-circle"></i> Test Access Permissions</h4>
+                    <div class="text-center">
+                        <button class="btn btn-primary test-button" onclick="testUserManagement()">
+                            <i class="bi bi-person-gear"></i> Access User Management
+                        </button>
+                        <button class="btn btn-success test-button" onclick="testFinancial()">
+                            <i class="bi bi-currency-dollar"></i> Access Financial Data
+                        </button>
+                        <button class="btn btn-warning test-button" onclick="testHR()">
+                            <i class="bi bi-people"></i> Access HR Functions
+                        </button>
+                        <button class="btn btn-info test-button" onclick="testTransactions()">
+                            <i class="bi bi-receipt"></i> Access Transactions
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Display -->
+            <div class="row">
+                <div class="col-12">
+                    <h4 class="mb-3"><i class="bi bi-clipboard-check"></i> Test Results</h4>
+                    <div id="resultBox" class="result-box">
+                        <div class="text-center text-muted">
+                            <i class="bi bi-arrow-up" style="font-size: 2rem;"></i>
+                            <p class="mt-2">Select a role and click a test button to see the results</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Information Panel -->
+            <div class="row mt-5">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="bi bi-info-circle"></i> Role Permissions Matrix</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Role</th>
+                                            <th>User Management</th>
+                                            <th>Financial Data</th>
+                                            <th>HR Functions</th>
+                                            <th>Transaction Approval</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><span class="badge bg-secondary">Guest</span></td>
+                                            <td><i class="bi bi-x-circle text-danger"></i></td>
+                                            <td><i class="bi bi-x-circle text-danger"></i></td>
+                                            <td><i class="bi bi-x-circle text-danger"></i></td>
+                                            <td><i class="bi bi-x-circle text-danger"></i></td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="badge bg-info">User</span></td>
+                                            <td><i class="bi bi-x-circle text-danger"></i></td>
+                                            <td><i class="bi bi-x-circle text-danger"></i></td>
+                                            <td><i class="bi bi-x-circle text-danger"></i></td>
+                                            <td><i class="bi bi-x-circle text-danger"></i></td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="badge bg-primary">Finance</span></td>
+                                            <td><i class="bi bi-x-circle text-danger"></i></td>
+                                            <td><i class="bi bi-check-circle text-success"></i></td>
+                                            <td><i class="bi bi-x-circle text-danger"></i></td>
+                                            <td><i class="bi bi-x-circle text-danger"></i></td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="badge bg-warning">Manager</span></td>
+                                            <td><i class="bi bi-check-circle text-success"></i></td>
+                                            <td><i class="bi bi-check-circle text-success"></i></td>
+                                            <td><i class="bi bi-check-circle text-success"></i></td>
+                                            <td><i class="bi bi-check-circle text-success"></i></td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="badge bg-success">HR</span></td>
+                                            <td><i class="bi bi-check-circle text-success"></i></td>
+                                            <td><i class="bi bi-x-circle text-danger"></i></td>
+                                            <td><i class="bi bi-check-circle text-success"></i></td>
+                                            <td><i class="bi bi-x-circle text-danger"></i></td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="badge bg-danger">Admin</span></td>
+                                            <td><i class="bi bi-check-circle text-success"></i></td>
+                                            <td><i class="bi bi-check-circle text-success"></i></td>
+                                            <td><i class="bi bi-check-circle text-success"></i></td>
+                                            <td><i class="bi bi-check-circle text-success"></i></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-4 mt-5">
+        <div class="container text-center">
+            <p class="mb-0">&copy; 2024 GlobalVen. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        let selectedRole = null;
+        
+        function selectRole(role) {
+            selectedRole = role;
+            
+            // Update UI
+            document.querySelectorAll('.role-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            event.target.closest('.role-card').classList.add('selected');
+            
+            // Update current role display
+            const roleElement = document.getElementById('currentRole');
+            const descElement = document.getElementById('roleDescription');
+            
+            roleElement.textContent = role;
+            roleElement.className = 'badge bg-' + getRoleBadgeClass(role);
+            
+            descElement.textContent = getRoleDescription(role);
+            
+            // Clear results
+            clearResults();
+        }
+        
+        function getRoleBadgeClass(role) {
+            switch(role) {
+                case 'GUEST': return 'secondary';
+                case 'USER': return 'info';
+                case 'FINANCE': return 'primary';
+                case 'MANAGER': return 'warning';
+                case 'HR': return 'success';
+                case 'ADMIN': return 'danger';
+                default: return 'secondary';
+            }
+        }
+        
+        function getRoleDescription(role) {
+            switch(role) {
+                case 'GUEST': return '- No system access';
+                case 'USER': return '- Basic system access only';
+                case 'FINANCE': return '- Access to financial data and reports';
+                case 'MANAGER': return '- Management access with approval rights';
+                case 'HR': return '- Human resources and employee management';
+                case 'ADMIN': return '- Full system administration access';
+                default: return '';
+            }
+        }
+        
+        function testUserManagement() {
+            if (!selectedRole) {
+                showError('Please select a role first');
+                return;
+            }
+            
+            // Simulate the authorization check
+            const hasAccess = ['ADMIN', 'HR', 'MANAGER'].includes(selectedRole);
+            
+            if (hasAccess) {
+                showSuccess('✅ Access Granted', 'Redirecting to User Management...', () => {
+                    window.open('/users?role=' + selectedRole, '_blank');
+                });
+            } else {
+                showError('❌ Access Denied', 'Redirecting to unauthorized page...', () => {
+                    window.open('/unauthorized?resource=user-management&role=' + selectedRole, '_blank');
+                });
+            }
+        }
+        
+        function testFinancial() {
+            if (!selectedRole) {
+                showError('Please select a role first');
+                return;
+            }
+            
+            const hasAccess = ['ADMIN', 'FINANCE', 'MANAGER'].includes(selectedRole);
+            
+            if (hasAccess) {
+                showSuccess('✅ Access Granted', 'You can access financial data and reports');
+            } else {
+                showError('❌ Access Denied', 'Insufficient privileges for financial data access');
+            }
+        }
+        
+        function testHR() {
+            if (!selectedRole) {
+                showError('Please select a role first');
+                return;
+            }
+            
+            const hasAccess = ['ADMIN', 'HR', 'MANAGER'].includes(selectedRole);
+            
+            if (hasAccess) {
+                showSuccess('✅ Access Granted', 'You can access HR functions and employee data');
+            } else {
+                showError('❌ Access Denied', 'Insufficient privileges for HR functions');
+            }
+        }
+        
+        function testTransactions() {
+            if (!selectedRole) {
+                showError('Please select a role first');
+                return;
+            }
+            
+            const hasAccess = ['ADMIN', 'MANAGER'].includes(selectedRole);
+            
+            if (hasAccess) {
+                showSuccess('✅ Access Granted', 'You can approve and manage transactions', () => {
+                    window.open('/transactions?role=' + selectedRole, '_blank');
+                });
+            } else {
+                showError('❌ Access Denied', 'Only Admins and Managers can approve transactions');
+            }
+        }
+        
+        function showSuccess(title, message, callback = null) {
+            const resultBox = document.getElementById('resultBox');
+            resultBox.className = 'result-box success-result';
+            resultBox.innerHTML = `
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-check-circle-fill text-success me-3" style="font-size: 2rem;"></i>
+                    <div>
+                        <h5 class="mb-1">${title}</h5>
+                        <p class="mb-0">${message}</p>
+                        ${callback ? '<small class="text-muted">Click will open in new tab in 2 seconds...</small>' : ''}
+                    </div>
+                </div>
+            `;
+            
+            if (callback) {
+                setTimeout(callback, 2000);
+            }
+        }
+        
+        function showError(title, message, callback = null) {
+            const resultBox = document.getElementById('resultBox');
+            resultBox.className = 'result-box error-result';
+            resultBox.innerHTML = `
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-x-circle-fill text-danger me-3" style="font-size: 2rem;"></i>
+                    <div>
+                        <h5 class="mb-1">${title}</h5>
+                        <p class="mb-0">${message}</p>
+                        ${callback ? '<small class="text-muted">Click will open in new tab in 2 seconds...</small>' : ''}
+                    </div>
+                </div>
+            `;
+            
+            if (callback) {
+                setTimeout(callback, 2000);
+            }
+        }
+        
+        function clearResults() {
+            const resultBox = document.getElementById('resultBox');
+            resultBox.className = 'result-box';
+            resultBox.innerHTML = `
+                <div class="text-center text-muted">
+                    <i class="bi bi-arrow-up" style="font-size: 2rem;"></i>
+                    <p class="mt-2">Select a role and click a test button to see the results</p>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
+

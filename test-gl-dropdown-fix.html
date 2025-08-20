@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GL Reference Code Dropdown Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            background: #007bff;
+            color: white;
+            padding: 15px;
+            margin: -20px -20px 20px -20px;
+            border-radius: 8px 8px 0 0;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .success {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+        .info {
+            background-color: #e2e3e5;
+            border-color: #d3d3d4;
+            color: #383d41;
+        }
+        select {
+            width: 100%;
+            padding: 8px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .result {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-family: monospace;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 GL Reference Code Dropdown Fix Test</h1>
+            <p>Testing the fixed column mapping for GL Reference Codes from SQL Server</p>
+        </div>
+
+        <div class="test-section info">
+            <h3>📋 Test Overview</h3>
+            <p><strong>Issue:</strong> GL Reference Code dropdown was empty due to incorrect column mapping</p>
+            <p><strong>Root Cause:</strong> Expected columns (id, code, description) vs Actual columns (CHT_ACC_ALIAS, CHT_ACC_NAME)</p>
+            <p><strong>Fix:</strong> Updated mapRowToGlRefCodeDto() method to use correct column names</p>
+        </div>
+
+        <div class="test-section">
+            <h3>🔗 API Endpoint Tests</h3>
+            <button onclick="testEndpoint('/api/glref-codes/test-connection', 'connection-result')">Test Connection</button>
+            <button onclick="testEndpoint('/api/glref-codes/sample-data', 'sample-result')">Test Sample Data</button>
+            <button onclick="testEndpoint('/api/glref-codes/active-for-dropdown', 'dropdown-result')">Test Dropdown Endpoint</button>
+            
+            <div id="connection-result" class="result" style="display:none;"></div>
+            <div id="sample-result" class="result" style="display:none;"></div>
+            <div id="dropdown-result" class="result" style="display:none;"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>📝 GL Reference Code Dropdown</h3>
+            <label for="glRefCodeSelect">Select GL Reference Code:</label>
+            <select id="glRefCodeSelect">
+                <option value="">-- Loading GL Reference Codes --</option>
+            </select>
+            
+            <div id="selection-info" class="result" style="display:none;"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>📊 Test Results</h3>
+            <div id="test-results"></div>
+        </div>
+    </div>
+
+    <script>
+        // Test endpoint function
+        async function testEndpoint(endpoint, resultId) {
+            const resultDiv = document.getElementById(resultId);
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '⏳ Testing endpoint: ' + endpoint;
+            
+            try {
+                const response = await fetch(endpoint);
+                const data = await response.json();
+                
+                resultDiv.innerHTML = `
+                    <strong>✅ ${endpoint}</strong><br>
+                    Status: ${response.status}<br>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <strong>❌ ${endpoint}</strong><br>
+                    Error: ${error.message}
+                `;
+            }
+        }
+
+        // Load GL Reference Codes for dropdown
+        async function loadGlRefCodes() {
+            const select = document.getElementById('glRefCodeSelect');
+            const testResults = document.getElementById('test-results');
+            
+            try {
+                const response = await fetch('/api/glref-codes/sample-data');
+                const data = await response.json();
+                
+                // Clear loading option
+                select.innerHTML = '<option value="">-- Select GL Reference Code --</option>';
+                
+                if (data.status === 'SUCCESS' && data.sampleData && data.sampleData.length > 0) {
+                    // Populate dropdown
+                    data.sampleData.forEach(item => {
+                        const option = document.createElement('option');
+                        option.value = item.code;
+                        option.textContent = `${item.code} - ${item.description}`;
+                        select.appendChild(option);
+                    });
+                    
+                    testResults.innerHTML = `
+                        <div class="success">
+                            <h4>✅ SUCCESS: GL Reference Code dropdown populated successfully!</h4>
+                            <p><strong>Records loaded:</strong> ${data.sampleData.length}</p>
+                            <p><strong>Column mapping:</strong> CHT_ACC_ALIAS → code, CHT_ACC_NAME → description</p>
+                            <p><strong>Sample record:</strong> ${data.sampleData[0].code} - ${data.sampleData[0].description}</p>
+                        </div>
+                    `;
+                } else {
+                    select.innerHTML = '<option value="">-- No GL Reference Codes Available --</option>';
+                    testResults.innerHTML = `
+                        <div class="error">
+                            <h4>❌ ERROR: No data returned from API</h4>
+                            <p>Response: ${JSON.stringify(data, null, 2)}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                select.innerHTML = '<option value="">-- Error Loading GL Reference Codes --</option>';
+                testResults.innerHTML = `
+                    <div class="error">
+                        <h4>❌ ERROR: Failed to load GL Reference Codes</h4>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Handle dropdown selection
+        document.getElementById('glRefCodeSelect').addEventListener('change', function() {
+            const selectedValue = this.value;
+            const selectedText = this.options[this.selectedIndex].text;
+            const infoDiv = document.getElementById('selection-info');
+            
+            if (selectedValue) {
+                infoDiv.style.display = 'block';
+                infoDiv.innerHTML = `
+                    <strong>Selected GL Reference Code:</strong><br>
+                    Code: ${selectedValue}<br>
+                    Full Text: ${selectedText}
+                `;
+            } else {
+                infoDiv.style.display = 'none';
+            }
+        });
+
+        // Load data on page load
+        window.addEventListener('load', loadGlRefCodes);
+    </script>
+</body>
+</html>

@@ -1,0 +1,1997 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transactions - GlobalVen</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    
+    <!-- Print Styles -->
+    <style media="print">
+        /* Hide navigation and non-essential elements when printing */
+        .navbar, .page-header, .btn, .modal, .dropdown, .pagination, 
+        .no-print, .filters-section, .action-buttons, .print-summary, #statisticsCards {
+            display: none !important;
+        }
+        
+        /* Print-specific styles */
+        body {
+            background: white !important;
+            color: black !important;
+            font-size: 12px !important;
+            line-height: 1.4 !important;
+        }
+        
+        .container {
+            max-width: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+        
+        .card {
+            border: none !important;
+            box-shadow: none !important;
+        }
+        
+        .table {
+            font-size: 11px !important;
+        }
+        
+        .table th, .table td {
+            padding: 4px !important;
+            border: 1px solid #000 !important;
+        }
+        
+        .table thead th {
+            background-color: #f8f9fa !important;
+            font-weight: bold !important;
+        }
+        
+        .print-header {
+            display: block !important;
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #000;
+            padding-bottom: 10px;
+        }
+        
+        .print-footer {
+            display: block !important;
+            text-align: center;
+            margin-top: 20px;
+            border-top: 1px solid #000;
+            padding-top: 10px;
+            font-size: 10px;
+        }
+        
+
+        
+        /* Status badges for print */
+        .badge {
+            border: 1px solid #000 !important;
+            background-color: white !important;
+            color: black !important;
+            padding: 2px 6px !important;
+        }
+        
+        /* Page break handling */
+        .page-break {
+            page-break-before: always;
+        }
+        
+        .no-page-break {
+            page-break-inside: avoid;
+        }
+        
+        /* Print title */
+        .print-title {
+            font-size: 18px !important;
+            font-weight: bold !important;
+            margin-bottom: 10px !important;
+        }
+    </style>
+    
+    <!-- Screen-only styles -->
+    <style media="screen">
+        .print-only {
+            display: none;
+        }
+        
+        .print-button {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            border: none;
+            transition: all 0.3s ease;
+        }
+        
+        .print-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+        }
+        
+        .select-checkbox {
+            transform: scale(1.2);
+            margin-right: 5px;
+        }
+        
+        .selected-row {
+            background-color: #f8f9fa !important;
+        }
+        
+        .print-selection-info {
+            background-color: #e3f2fd;
+            border: 1px solid #2196f3;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Menu -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-building"></i> GlobalVen
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">
+                            <i class="bi bi-house-door"></i> Home
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="masterSettingsDropdown" role="button" 
+                           data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-gear"></i> Master Settings
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="masterSettingsDropdown">
+                            <li>
+                                <a class="dropdown-item" href="/employees">
+                                    <i class="bi bi-people"></i> Employees
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item" href="/categories">
+                                    <i class="bi bi-tags"></i> Categories
+                                </a>
+                            </li>                            <li>
+                                <a class="dropdown-item" href="/rates">
+                                    <i class="bi bi-currency-dollar"></i> Rates
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="/country">
+                                    <i class="bi bi-globe"></i> Country
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item" href="/departments">
+                                    <i class="bi bi-building"></i> Departments
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="/positions">
+                                    <i class="bi bi-briefcase"></i> Positions
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item" href="/system-settings">
+                                    <i class="bi bi-sliders"></i> System Settings
+                                </a>
+                            </li>
+                        </ul>                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle active" href="#" id="transactionsDropdown" role="button" 
+                           data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-receipt"></i> Transactions
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="transactionsDropdown">
+                            <li>
+                                <a class="dropdown-item active" href="/transactions">
+                                    <i class="bi bi-receipt-cutoff"></i> Manage Transfers
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item" href="/income">
+                                    <i class="bi bi-cash-coin"></i> Manage Income
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="/expenses">
+                                    <i class="bi bi-credit-card"></i> Manage Expenses
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="/reports">
+                                    <i class="bi bi-graph-up"></i> Transaction Reports
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/about">
+                            <i class="bi bi-info-circle"></i> About
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="container">
+            <h1><i class="bi bi-receipt-cutoff"></i> Manage Expenses</h1>
+            <p class="lead">Track and manage all financial transactions</p>
+        </div>
+    </div>    <!-- Print-only Header -->
+    <div class="print-only print-header">
+        <div class="print-title">GlobalVen - Transaction Report</div>
+        <div>Generated on: <span id="print-date"></span></div>
+        <div>Total Records: <span id="print-record-count">0</span></div>
+    </div>
+
+    <!-- Content Section -->
+    <section class="content-section">
+        <div class="container">
+            <!-- Transaction Summary Cards -->
+            <div class="row mb-4" id="statisticsCards">
+                <div class="col-md-3">
+                    <div class="card bg-primary-light">
+                        <div class="card-body">
+                            <h6 class="text-primary">Total Transfers</h6>
+                            <h3 class="mb-0" id="totalTransfers">0</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-warning-light">
+                        <div class="card-body">
+                            <h6 class="text-warning">Pending</h6>
+                            <h3 class="mb-0" id="pendingCount">0</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-success-light">
+                        <div class="card-body">
+                            <h6 class="text-success">Approved</h6>
+                            <h3 class="mb-0" id="approvedCount">0</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-info-light">
+                        <div class="card-body">
+                            <h6 class="text-info">Processed</h6>
+                            <h3 class="mb-0" id="processedCount">0</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filters Row -->
+            <div class="row mb-4 filters-section">
+                <div class="col-md-2">
+                    <select class="form-select" id="statusFilter" onchange="filterTransfers()">
+                        <option value="">All Statuses</option>
+                        <option value="PENDING">Pending</option>
+                        <option value="APPROVED">Approved</option>
+                        <option value="REJECTED">Rejected</option>
+                        <option value="PROCESSED">Processed</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select" id="employeeFilter" onchange="filterTransfers()">
+                        <option value="">All Employees</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select class="form-select" id="glrefcodeFilter" onchange="filterByGlrefcode()">
+                        <option value="">All GL Codes</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Search..." id="searchInput" onkeyup="searchTransfers()">
+                        <button class="btn btn-outline-secondary" onclick="searchTransfers()">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-3 text-end">
+                    <div class="btn-group me-2">
+                        <button class="btn btn-success print-button" onclick="printTransactions()" title="Print All Transactions">
+                            <i class="bi bi-printer"></i> Print All
+                        </button>
+                        <button class="btn btn-outline-success" onclick="printSelectedTransactions()" title="Print Selected Transactions" id="printSelectedBtn" disabled>
+                            <i class="bi bi-printer-fill"></i> Print Selected (<span id="selectedCount">0</span>)
+                        </button>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-info dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-download"></i> Export
+                        </button>                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#" onclick="exportToCSV('all')">
+                                <i class="bi bi-filetype-csv"></i> Export All CSV
+                            </a></li>
+                            <li><a class="dropdown-item" href="#" onclick="exportToCSV('selected')" id="exportSelectedCSV">
+                                <i class="bi bi-filetype-csv"></i> Export Selected CSV
+                            </a></li>
+                            <li><a class="dropdown-item" href="#" onclick="exportToExcel('all')">
+                                <i class="bi bi-file-earmark-spreadsheet"></i> Export All Excel
+                            </a></li>
+                            <li><a class="dropdown-item" href="#" onclick="exportToExcel('selected')" id="exportSelectedExcel">
+                                <i class="bi bi-file-earmark-spreadsheet-fill"></i> Export Selected Excel
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#" onclick="exportToPDF('all')">
+                                <i class="bi bi-filetype-pdf"></i> Export All PDF
+                            </a></li>
+                            <li><a class="dropdown-item" href="#" onclick="exportToPDF('selected')" id="exportSelectedPDF">
+                                <i class="bi bi-filetype-pdf"></i> Export Selected PDF
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#" onclick="exportToTamil('all')">
+                                <i class="bi bi-translate"></i> Export Tamil Document (All)
+                            </a></li>
+                            <li><a class="dropdown-item" href="#" onclick="exportToTamil('selected')" id="exportSelectedTamil">
+                                <i class="bi bi-translate"></i> Export Tamil Document (Selected)
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#" onclick="printTransactions()">
+                                <i class="bi bi-printer"></i> Print All
+                            </a></li>
+                            <li><a class="dropdown-item" href="#" onclick="printSelectedTransactions()" id="printSelectedDropdown">
+                                <i class="bi bi-printer-fill"></i> Print Selected
+                            </a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <h2>Transactions</h2>
+                </div>
+                <div class="col-md-6 text-end">
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addTransactionModal">
+                        <i class="bi bi-plus-circle"></i> Add New Transaction
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Selection Info Panel -->
+            <div id="selectionInfo" class="print-selection-info" style="display: none;">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <i class="bi bi-info-circle"></i>
+                        <strong id="selectionText">0 transactions selected</strong>
+                        <span class="ms-3">
+                            <button class="btn btn-sm btn-outline-primary" onclick="selectAll()">
+                                <i class="bi bi-check-all"></i> Select All
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary ms-1" onclick="clearSelection()">
+                                <i class="bi bi-x-circle"></i> Clear Selection
+                            </button>
+                        </span>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <button class="btn btn-sm btn-success" onclick="printSelectedTransactions()" id="quickPrintSelected" disabled>
+                            <i class="bi bi-printer-fill"></i> Print Selected
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+
+            
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">                        
+                        <table class="table table-hover" id="transactions-table">
+                            <thead>
+                                <tr>
+                                    <th class="no-print" style="width: 50px;">
+                                        <input type="checkbox" id="selectAll" class="form-check-input select-checkbox" 
+                                               onchange="toggleSelectAll()" title="Select All">
+                                    </th>
+                                    <th>ID</th>
+                                    <th>Date</th>
+                                    <th>Employee</th>
+                                    <th>Type</th>
+                                    <th>Amount</th>
+                                    <th>GL Ref Code</th>
+                                    <th>Description</th>
+                                    <th>Status</th>
+                                    <th class="no-print">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="transfers-table-body">
+                                <tr>
+                                    <td colspan="10" class="text-center">
+                                        <div class="spinner-border text-primary" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Print-only Footer -->
+    <div class="print-only print-footer">
+        <div>GlobalVen - Employee Management System</div>
+        <div>Report generated by: System Administrator | Date: <span id="print-footer-date"></span></div>
+        <div>This is a computer-generated report. No signature required.</div>
+    </div>
+
+    <!-- Add Transaction Modal -->
+    <div class="modal fade" id="addTransactionModal" tabindex="-1" aria-labelledby="addTransactionModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <form id="transactionForm" class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="addTransactionModalLabel">Add New Transaction</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">            <div class="mb-3">
+              <label for="employeeSelect" class="form-label">Employee</label>
+              <select class="form-select" id="employeeSelect" required>
+                <option value="">Select Employee</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="rateSelect" class="form-label">Rate</label>
+              <select class="form-select" id="rateSelect" required>
+                <option value="">Select Rate</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="amount" class="form-label">Amount</label>
+              <input type="number" step="0.01" class="form-control" id="amount" required>
+            </div>
+            <div class="mb-3">
+              <label for="transactionType" class="form-label">Transaction Type</label>
+              <select class="form-select" id="transactionType" required>
+                <option value="">Select Type</option>
+                <option value="SALARY">Salary</option>
+                <option value="BONUS">Bonus</option>
+                <option value="OVERTIME">Overtime</option>
+                <option value="DEDUCTION">Deduction</option>
+                <option value="ALLOWANCE">Allowance</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="currency" class="form-label">Currency</label>
+              <select class="form-select" id="currency" required>
+                <option value="USD">USD</option>
+                <option value="EUR">EUR</option>
+                <option value="GBP">GBP</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="glrefcode" class="form-label">GL Reference Code</label>
+              <div class="input-group">
+                <select class="form-select" id="glrefcode" required>
+                  <option value="">Select GL Reference Code</option>
+                </select>
+                <button class="btn btn-outline-secondary" type="button" onclick="refreshGlRefCodes()" title="Refresh GL Codes">
+                  <i class="bi bi-arrow-clockwise"></i>
+                </button>
+              </div>
+              <div class="form-text">
+                <small>
+                  <a href="#" onclick="showGlRefCodeSearch()" class="text-decoration-none">
+                    <i class="bi bi-search"></i> Search GL Codes
+                  </a> | 
+                  <a href="#" onclick="showAllGlRefCodes()" class="text-decoration-none">
+                    <i class="bi bi-list"></i> View All
+                  </a>
+                </small>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label for="description" class="form-label">Description</label>
+              <textarea class="form-control" id="description" rows="3"></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save Transaction</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Edit Transaction Modal -->
+    <div class="modal fade" id="editTransactionModal" tabindex="-1" aria-labelledby="editTransactionModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <form id="editTransactionForm" class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="editTransactionModalLabel">Edit Transaction</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <input type="hidden" id="editTransactionId">            <div class="mb-3">
+              <label for="editEmployeeSelect" class="form-label">Employee</label>
+              <select class="form-select" id="editEmployeeSelect" required>
+                <option value="">Select Employee</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="editRateSelect" class="form-label">Rate</label>
+              <select class="form-select" id="editRateSelect" required>
+                <option value="">Select Rate</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="editAmount" class="form-label">Amount</label>
+              <input type="number" step="0.01" class="form-control" id="editAmount" required>
+            </div>
+            <div class="mb-3">
+              <label for="editTransactionType" class="form-label">Transaction Type</label>
+              <select class="form-select" id="editTransactionType" required>
+                <option value="">Select Type</option>
+                <option value="SALARY">Salary</option>
+                <option value="BONUS">Bonus</option>
+                <option value="OVERTIME">Overtime</option>
+                <option value="DEDUCTION">Deduction</option>
+                <option value="ALLOWANCE">Allowance</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="editCurrency" class="form-label">Currency</label>
+              <select class="form-select" id="editCurrency" required>
+                <option value="USD">USD</option>
+                <option value="EUR">EUR</option>
+                <option value="GBP">GBP</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="editGlrefcode" class="form-label">GL Reference Code</label>
+              <div class="input-group">
+                <select class="form-select" id="editGlrefcode" required>
+                  <option value="">Select GL Reference Code</option>
+                </select>
+                <button class="btn btn-outline-secondary" type="button" onclick="refreshGlRefCodes()" title="Refresh GL Codes">
+                  <i class="bi bi-arrow-clockwise"></i>
+                </button>
+              </div>
+              <div class="form-text">
+                <small>
+                  <a href="#" onclick="showGlRefCodeSearch()" class="text-decoration-none">
+                    <i class="bi bi-search"></i> Search GL Codes
+                  </a> | 
+                  <a href="#" onclick="showAllGlRefCodes()" class="text-decoration-none">
+                    <i class="bi bi-list"></i> View All
+                  </a>
+                </small>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label for="editDescription" class="form-label">Description</label>
+              <textarea class="form-control" id="editDescription" rows="3"></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary">Update Transaction</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- View Transaction Modal -->
+    <div class="modal fade" id="viewTransactionModal" tabindex="-1" aria-labelledby="viewTransactionModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="viewTransactionModalLabel">Transaction Details</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body" id="viewTransactionDetails">
+            <!-- Transaction details will be loaded here -->
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-4 mt-5">
+        <div class="container text-center">
+            <p class="mb-0">&copy; 2024 GlobalVen. All rights reserved.</p>
+        </div>
+    </footer>    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    
+    <!-- Transaction Management JavaScript -->
+    <script>
+        // API Services
+        class TransfersAPI {
+            constructor() {
+                this.baseUrl = '/api/transfers';
+            }
+
+            async getAllTransfers() {
+                try {
+                    const response = await fetch(this.baseUrl);
+                    if (!response.ok) throw new Error('Failed to fetch transfers');
+                    return await response.json();
+                } catch (error) {
+                    console.error('Error fetching transfers:', error);
+                    return [];
+                }
+            }
+
+            async getTransferById(id) {
+                try {
+                    const response = await fetch(`${this.baseUrl}/${id}`);
+                    if (!response.ok) throw new Error('Transfer not found');
+                    return await response.json();
+                } catch (error) {
+                    console.error('Error fetching transfer:', error);
+                    return null;
+                }
+            }
+
+            async createTransfer(transferData) {
+                try {
+                    const response = await fetch(this.baseUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(transferData)
+                    });
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        throw new Error(`Failed to create transfer: ${response.status} ${errorText}`);
+                    }
+                    return await response.json();
+                } catch (error) {
+                    console.error('Error creating transfer:', error);
+                    throw error;
+                }
+            }
+
+            async updateTransfer(id, transferData) {
+                try {
+                    const response = await fetch(`${this.baseUrl}/${id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(transferData)
+                    });
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        throw new Error(`Failed to update transfer: ${response.status} ${errorText}`);
+                    }
+                    return await response.json();
+                } catch (error) {
+                    console.error('Error updating transfer:', error);
+                    throw error;
+                }
+            }
+
+            async deleteTransfer(id) {
+                try {
+                    const response = await fetch(`${this.baseUrl}/${id}`, { method: 'DELETE' });
+                    if (!response.ok) throw new Error('Failed to delete transfer');
+                    return true;
+                } catch (error) {
+                    console.error('Error deleting transfer:', error);
+                    throw error;
+                }
+            }
+
+            async approveTransfer(id, approver) {
+                try {
+                    const response = await fetch(`${this.baseUrl}/${id}/approve?approver=${encodeURIComponent(approver)}`, {
+                        method: 'PATCH'
+                    });
+                    if (!response.ok) throw new Error('Failed to approve transfer');
+                    return await response.json();
+                } catch (error) {
+                    console.error('Error approving transfer:', error);
+                    throw error;
+                }
+            }
+
+            async rejectTransfer(id, rejector) {
+                try {
+                    const response = await fetch(`${this.baseUrl}/${id}/reject?rejector=${encodeURIComponent(rejector)}`, {
+                        method: 'PATCH'
+                    });
+                    if (!response.ok) throw new Error('Failed to reject transfer');
+                    return await response.json();
+                } catch (error) {
+                    console.error('Error rejecting transfer:', error);
+                    throw error;
+                }
+            }
+
+            async processTransfer(id, processor) {
+                try {
+                    const response = await fetch(`${this.baseUrl}/${id}/process?processor=${encodeURIComponent(processor)}`, {
+                        method: 'PATCH'
+                    });
+                    if (!response.ok) throw new Error('Failed to process transfer');
+                    return await response.json();
+                } catch (error) {
+                    console.error('Error processing transfer:', error);
+                    throw error;
+                }
+            }
+
+            async getStatistics() {
+                try {
+                    const response = await fetch(`${this.baseUrl}/statistics`);
+                    if (!response.ok) throw new Error('Failed to fetch statistics');
+                    return await response.json();
+                } catch (error) {
+                    console.error('Error fetching statistics:', error);
+                    return {};
+                }
+            }
+
+            async searchTransfers(keyword) {
+                try {
+                    const response = await fetch(`${this.baseUrl}/search?keyword=${encodeURIComponent(keyword)}`);
+                    if (!response.ok) throw new Error('Search failed');
+                    return await response.json();
+                } catch (error) {
+                    console.error('Error searching transfers:', error);
+                    return [];
+                }
+            }
+
+            async searchTransfersByGlrefcode(glrefcode) {
+                try {
+                    const response = await fetch(`${this.baseUrl}/search-glrefcode?glrefcode=${encodeURIComponent(glrefcode)}`);
+                    if (!response.ok) throw new Error('Search by glrefcode failed');
+                    return await response.json();
+                } catch (error) {
+                    console.error('Error searching transfers by glrefcode:', error);
+                    return [];
+                }
+            }
+
+            async getTransfersByStatus(status) {
+                try {
+                    const response = await fetch(`${this.baseUrl}/status/${status}`);
+                    if (!response.ok) throw new Error('Failed to fetch transfers by status');
+                    return await response.json();
+                } catch (error) {
+                    console.error('Error fetching transfers by status:', error);
+                    return [];
+                }
+            }
+
+            async getTransfersByEmployee(employeeId) {
+                try {
+                    const response = await fetch(`${this.baseUrl}/employee/${employeeId}`);
+                    if (!response.ok) throw new Error('Failed to fetch transfers by employee');
+                    return await response.json();
+                } catch (error) {
+                    console.error('Error fetching transfers by employee:', error);
+                    return [];
+                }
+            }
+
+            async getTransfersByCategory(categoryId) {
+                try {
+                    const response = await fetch(`${this.baseUrl}/category/${categoryId}`);
+                    if (!response.ok) throw new Error('Failed to fetch transfers by category');
+                    return await response.json();
+                } catch (error) {
+                    console.error('Error fetching transfers by category:', error);
+                    return [];
+                }
+            }
+        }
+
+        class EmployeeAPI {
+            constructor() {
+                this.baseUrl = '/api/employees';
+            }
+
+            async getAllEmployees() {
+                try {
+                    const response = await fetch(this.baseUrl);
+                    if (!response.ok) throw new Error('Failed to fetch employees');
+                    return await response.json();
+                } catch (error) {
+                    console.error('Error fetching employees:', error);
+                    return [];
+                }
+            }        }
+
+        class RatesAPI {
+            constructor() {
+                this.baseUrl = '/api/rates';
+            }
+
+            async getAllRates() {
+                try {
+                    const response = await fetch(this.baseUrl);
+                    if (!response.ok) throw new Error('Failed to fetch rates');
+                    return await response.json();
+                } catch (error) {
+                    console.error('Error fetching rates:', error);
+                    return [];
+                }
+            }
+        }
+
+        class GlRefCodeAPI {
+            constructor() {
+                this.baseUrl = '/api/glref-codes';
+            }
+
+            async getAllGlRefCodes() {
+                try {
+                    const response = await fetch(this.baseUrl);
+                    if (!response.ok) throw new Error('Failed to fetch GL reference codes');
+                    return await response.json();
+                } catch (error) {
+                    console.error('Error fetching GL reference codes:', error);
+                    return [];
+                }
+            }
+
+            async getActiveGlRefCodes() {
+                try {
+                    const response = await fetch(`${this.baseUrl}/active`);
+                    if (!response.ok) throw new Error('Failed to fetch active GL reference codes');
+                    return await response.json();
+                } catch (error) {
+                    console.error('Error fetching active GL reference codes:', error);
+                    return [];
+                }
+            }
+
+            async getGlRefCodesByCategory(category) {
+                try {
+                    const response = await fetch(`${this.baseUrl}/category/${encodeURIComponent(category)}`);
+                    if (!response.ok) throw new Error('Failed to fetch GL reference codes by category');
+                    return await response.json();
+                } catch (error) {
+                    console.error('Error fetching GL reference codes by category:', error);
+                    return [];
+                }
+            }
+
+            async searchGlRefCodes(searchTerm) {
+                try {
+                    const response = await fetch(`${this.baseUrl}/search?searchTerm=${encodeURIComponent(searchTerm)}`);
+                    if (!response.ok) throw new Error('Failed to search GL reference codes');
+                    return await response.json();
+                } catch (error) {
+                    console.error('Error searching GL reference codes:', error);
+                    return [];
+                }
+            }
+
+            async getGlRefCodeByCode(code) {
+                try {
+                    const response = await fetch(`${this.baseUrl}/code/${encodeURIComponent(code)}`);
+                    if (!response.ok) throw new Error('GL reference code not found');
+                    return await response.json();
+                } catch (error) {
+                    console.error('Error fetching GL reference code by code:', error);
+                    return null;
+                }
+            }
+
+            async getAllCategories() {
+                try {
+                    const response = await fetch(`${this.baseUrl}/categories`);
+                    if (!response.ok) throw new Error('Failed to fetch GL reference code categories');
+                    return await response.json();
+                } catch (error) {
+                    console.error('Error fetching GL reference code categories:', error);
+                    return [];
+                }
+            }
+
+            async getActiveGlRefCodesForDropdown() {
+                try {
+                    const response = await fetch(`${this.baseUrl}/active-for-dropdown`);
+                    if (!response.ok) throw new Error('Failed to fetch active GL reference codes for dropdown');
+                    return await response.json();
+                } catch (error) {
+                    console.error('Error fetching active GL reference codes for dropdown:', error);
+                    return [];
+                }
+            }
+        }
+
+        // Initialize APIs
+        const transfersAPI = new TransfersAPI();
+        const employeeAPI = new EmployeeAPI();
+        const ratesAPI = new RatesAPI();
+        const glRefCodeAPI = new GlRefCodeAPI();
+
+        // Load data on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTransferData();
+            loadStatistics();
+            loadEmployees();
+            loadRates();
+            loadGlRefCodes();
+        });
+
+        async function loadTransferData() {
+            try {
+                const transfers = await transfersAPI.getAllTransfers();
+                displayTransfers(transfers);
+            } catch (error) {
+                console.error('Error loading transfers:', error);
+                document.getElementById('transfers-table-body').innerHTML = 
+                    '<tr><td colspan="10" class="text-center text-danger">Error loading transfers</td></tr>';
+            }
+        }
+
+        async function loadStatistics() {
+            try {
+                const stats = await transfersAPI.getStatistics();
+                document.getElementById('totalTransfers').textContent = stats.totalTransfers || 0;
+                document.getElementById('pendingCount').textContent = stats.pendingCount || 0;
+                document.getElementById('approvedCount').textContent = stats.approvedCount || 0;
+                document.getElementById('processedCount').textContent = stats.processedCount || 0;
+            } catch (error) {
+                console.error('Error loading statistics:', error);
+            }
+        }
+
+        async function loadEmployees() {
+            try {
+                const employees = await employeeAPI.getAllEmployees();
+                const employeeSelect = document.getElementById('employeeSelect');
+                const editEmployeeSelect = document.getElementById('editEmployeeSelect');
+                const employeeFilter = document.getElementById('employeeFilter');
+                
+                [employeeSelect, editEmployeeSelect, employeeFilter].forEach(select => {
+                    if (select) {
+                        // Clear existing options except the first one
+                        while (select.children.length > 1) {
+                            select.removeChild(select.lastChild);
+                        }
+                        
+                        employees.forEach(employee => {
+                            const option = document.createElement('option');
+                            option.value = employee.id;
+                            option.textContent = `${employee.firstName} ${employee.lastName}`;
+                            select.appendChild(option);
+                        });
+                    }
+                });
+            } catch (error) {
+                console.error('Error loading employees:', error);
+            }        }
+
+        async function loadRates() {
+            try {
+                const rates = await ratesAPI.getAllRates();
+                const rateSelect = document.getElementById('rateSelect');
+                const editRateSelect = document.getElementById('editRateSelect');
+                
+                [rateSelect, editRateSelect].forEach(select => {
+                    if (select) {
+                        // Clear existing options except the first one
+                        while (select.children.length > 1) {
+                            select.removeChild(select.lastChild);
+                        }
+                          rates.forEach(rate => {
+                            const option = document.createElement('option');
+                            option.value = rate.id;
+                            option.textContent = `${rate.rateName} - ${rate.rateAmount} ${rate.currency}`;
+                            select.appendChild(option);
+                        });
+                    }
+                });
+            } catch (error) {
+                console.error('Error loading rates:', error);
+            }
+        }        async function loadGlRefCodes() {
+            try {
+                const glRefCodes = await glRefCodeAPI.getActiveGlRefCodesForDropdown();
+                const glRefCodeSelect = document.getElementById('glrefcode');
+                const editGlRefCodeSelect = document.getElementById('editGlrefcode');
+                const glRefCodeFilter = document.getElementById('glrefcodeFilter');
+                
+                [glRefCodeSelect, editGlRefCodeSelect].forEach(select => {
+                    if (select) {
+                        // Clear existing options except the first one
+                        while (select.children.length > 1) {
+                            select.removeChild(select.lastChild);
+                        }
+                        
+                        glRefCodes.forEach(glRefCode => {
+                            const option = document.createElement('option');
+                            option.value = glRefCode.code;
+                            option.textContent = `${glRefCode.code} - ${glRefCode.description}`;
+                            option.setAttribute('data-category', glRefCode.category || '');
+                            select.appendChild(option);
+                        });
+                    }
+                });
+
+                // Load filter dropdown
+                if (glRefCodeFilter) {
+                    // Clear existing options except the first one
+                    while (glRefCodeFilter.children.length > 1) {
+                        glRefCodeFilter.removeChild(glRefCodeFilter.lastChild);
+                    }
+                    
+                    glRefCodes.forEach(glRefCode => {
+                        const option = document.createElement('option');
+                        option.value = glRefCode.code;
+                        option.textContent = `${glRefCode.code} - ${glRefCode.description}`;
+                        glRefCodeFilter.appendChild(option);
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading GL reference codes:', error);
+            }
+        }
+
+        async function refreshGlRefCodes() {
+            try {
+                await loadGlRefCodes();
+                showToast('GL Reference codes refreshed successfully!', 'success');
+            } catch (error) {
+                showToast('Error refreshing GL Reference codes', 'error');
+            }
+        }
+
+        function showGlRefCodeSearch() {
+            const searchTerm = prompt('Enter search term for GL Reference codes:');
+            if (searchTerm && searchTerm.trim()) {
+                searchGlRefCodes(searchTerm.trim());
+            }
+        }
+
+        async function searchGlRefCodes(searchTerm) {
+            try {
+                const glRefCodes = await glRefCodeAPI.searchGlRefCodes(searchTerm);
+                if (glRefCodes.length === 0) {
+                    showToast('No GL Reference codes found for the search term', 'warning');
+                    return;
+                }
+
+                // Create a modal to display search results
+                showGlRefCodeSearchResults(glRefCodes);
+            } catch (error) {
+                showToast('Error searching GL Reference codes', 'error');
+            }
+        }
+
+        function showAllGlRefCodes() {
+            glRefCodeAPI.getAllGlRefCodes().then(glRefCodes => {
+                showGlRefCodeSearchResults(glRefCodes, 'All GL Reference Codes');
+            }).catch(error => {
+                showToast('Error loading GL Reference codes', 'error');
+            });
+        }
+
+        function showGlRefCodeSearchResults(glRefCodes, title = 'GL Reference Code Search Results') {
+            const modalHtml = `
+                <div class="modal fade" id="glRefCodeModal" tabindex="-1">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">${title}</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="table-responsive" style="max-height: 400px;">
+                                    <table class="table table-hover">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Code</th>
+                                                <th>Description</th>
+                                                <th>Category</th>
+                                                <th>Status</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            ${glRefCodes.map(code => `
+                                                <tr>
+                                                    <td><strong>${code.code}</strong></td>
+                                                    <td>${code.description || 'N/A'}</td>
+                                                    <td><span class="badge bg-info">${code.category || 'N/A'}</span></td>
+                                                    <td><span class="badge ${code.isActive ? 'bg-success' : 'bg-secondary'}">${code.isActive ? 'Active' : 'Inactive'}</span></td>
+                                                    <td>
+                                                        <button class="btn btn-sm btn-primary" onclick="selectGlRefCode('${code.code}', '${code.description || ''}')">
+                                                            Select
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            `).join('')}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Remove existing modal if any
+            const existingModal = document.getElementById('glRefCodeModal');
+            if (existingModal) {
+                existingModal.remove();
+            }
+
+            // Add new modal to body
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+            // Show modal
+            const modal = new bootstrap.Modal(document.getElementById('glRefCodeModal'));
+            modal.show();
+
+            // Clean up when modal is hidden
+            document.getElementById('glRefCodeModal').addEventListener('hidden.bs.modal', function() {
+                this.remove();
+            });
+        }
+
+        function selectGlRefCode(code, description) {
+            // Determine which form is currently open
+            const addModal = document.getElementById('addTransactionModal');
+            const editModal = document.getElementById('editTransactionModal');
+            
+            if (addModal && addModal.classList.contains('show')) {
+                document.getElementById('glrefcode').value = code;
+            } else if (editModal && editModal.classList.contains('show')) {
+                document.getElementById('editGlrefcode').value = code;
+            }
+
+            // Close the GL ref code modal
+            const glRefCodeModal = bootstrap.Modal.getInstance(document.getElementById('glRefCodeModal'));
+            if (glRefCodeModal) {
+                glRefCodeModal.hide();
+            }
+
+            showToast(`Selected GL Code: ${code}`, 'success');
+        }
+
+        function showToast(message, type = 'info') {
+            // Simple toast notification - you can enhance this with a proper toast library
+            const toastContainer = document.getElementById('toastContainer') || createToastContainer();
+            
+            const toast = document.createElement('div');
+            toast.className = `alert alert-${type === 'error' ? 'danger' : type} alert-dismissible fade show position-fixed`;
+            toast.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+            toast.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            
+            toastContainer.appendChild(toast);
+            
+            // Auto remove after 3 seconds
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.parentNode.removeChild(toast);
+                }
+            }, 3000);
+        }
+
+        function createToastContainer() {
+            const container = document.createElement('div');
+            container.id = 'toastContainer';
+            container.style.cssText = 'position: fixed; top: 0; right: 0; z-index: 9999;';
+            document.body.appendChild(container);
+            return container;
+        }        function displayTransfers(transfers) {
+            const tbody = document.getElementById('transfers-table-body');
+            if (!tbody) return;
+
+            if (transfers.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="10" class="text-center">No transfers found</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = transfers.map(transfer => `
+                <tr>
+                    <td class="no-print">
+                        <input type="checkbox" class="form-check-input transaction-checkbox" 
+                               value="${transfer.id}" 
+                               onchange="toggleTransactionSelection(this, '${transfer.id}')"
+                               title="Select for printing">
+                    </td>
+                    <td>${transfer.id}</td>
+                    <td>${formatDate(transfer.transactionDate)}</td>
+                    <td>${transfer.employee ? `${transfer.employee.firstName} ${transfer.employee.lastName}` : 'N/A'}</td>
+                    <td><span class="badge bg-info">${transfer.transactionType || 'N/A'}</span></td>
+                    <td>${formatCurrency(transfer.amount, transfer.currency)}</td>
+                    <td>
+                        ${transfer.glrefcode ? 
+                            `<span class="badge bg-secondary" title="GL Reference Code">${transfer.glrefcode}</span>` : 
+                            '<span class="text-muted">N/A</span>'
+                        }
+                    </td>
+                    <td>${transfer.description ? (transfer.description.length > 50 ? transfer.description.substring(0, 50) + '...' : transfer.description) : 'N/A'}</td>
+                    <td><span class="badge ${getStatusBadgeClass(transfer.status)}">${transfer.status}</span></td>
+                    <td class="action-buttons no-print">
+                        <div class="btn-group">
+                            <button class="btn btn-sm btn-info" onclick="viewTransfer(${transfer.id})" title="View">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                            <button class="btn btn-sm btn-warning" onclick="editTransfer(${transfer.id})" title="Edit">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            ${transfer.status === 'PENDING' ? `
+                                <button class="btn btn-sm btn-success" onclick="approveTransfer(${transfer.id})" title="Approve">
+                                    <i class="bi bi-check-circle"></i>
+                                </button>
+                                <button class="btn btn-sm btn-danger" onclick="rejectTransfer(${transfer.id})" title="Reject">
+                                    <i class="bi bi-x-circle"></i>
+                                </button>
+                            ` : ''}
+                            ${transfer.status === 'APPROVED' ? `
+                                <button class="btn btn-sm btn-primary" onclick="processTransfer(${transfer.id})" title="Process">
+                                    <i class="bi bi-arrow-right-circle"></i>
+                                </button>
+                            ` : ''}
+                            <button class="btn btn-sm btn-danger" onclick="deleteTransfer(${transfer.id})" title="Delete">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+            
+            // Clear selection after new data is loaded
+            selectedTransactions.clear();
+            document.getElementById('selectAll').checked = false;
+            updateSelectionInfo();
+        }        // Helper functions for display
+        function formatDate(dateString) {
+            if (!dateString) return 'N/A';
+            const date = new Date(dateString);
+            return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+        }        function formatCurrency(amount, currency = 'USD') {
+            if (!amount) return '0.00';
+            return new Intl.NumberFormat('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }).format(amount);
+        }
+
+        function getStatusBadgeClass(status) {
+            switch(status) {
+                case 'PENDING': return 'bg-warning';
+                case 'APPROVED': return 'bg-success';
+                case 'REJECTED': return 'bg-danger';
+                case 'PROCESSED': return 'bg-info';
+                default: return 'bg-secondary';
+            }
+        }
+
+        // Form submission handlers
+        document.getElementById('transactionForm').addEventListener('submit', async function(e) {
+            e.preventDefault();              const transferData = {
+                employeeId: parseInt(document.getElementById('employeeSelect').value),
+                rateId: parseInt(document.getElementById('rateSelect').value),
+                amount: parseFloat(document.getElementById('amount').value),
+                transactionType: document.getElementById('transactionType').value,
+                currency: document.getElementById('currency').value,
+                glrefcode: document.getElementById('glrefcode').value,
+                description: document.getElementById('description').value
+            };
+
+            try {
+                await transfersAPI.createTransfer(transferData);
+                bootstrap.Modal.getInstance(document.getElementById('addTransactionModal')).hide();
+                clearAddTransactionForm();
+                loadTransferData();
+                loadStatistics();
+                alert('Transaction created successfully!');
+            } catch (error) {
+                alert('Error creating transaction: ' + error.message);
+            }
+        });
+
+        document.getElementById('editTransactionForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const id = document.getElementById('editTransactionId').value;            const transferData = {
+                employee: { id: parseInt(document.getElementById('editEmployeeSelect').value) },
+                rate: { id: parseInt(document.getElementById('editRateSelect').value) },
+                amount: parseFloat(document.getElementById('editAmount').value),
+                transactionType: document.getElementById('editTransactionType').value,
+                currency: document.getElementById('editCurrency').value,
+                glrefcode: document.getElementById('editGlrefcode').value,
+                description: document.getElementById('editDescription').value
+            };
+
+            try {
+                await transfersAPI.updateTransfer(id, transferData);
+                bootstrap.Modal.getInstance(document.getElementById('editTransactionModal')).hide();
+                loadTransferData();
+                loadStatistics();
+                alert('Transaction updated successfully!');
+            } catch (error) {
+                alert('Error updating transaction: ' + error.message);
+            }
+        });
+
+        // Action functions
+        async function viewTransfer(id) {
+            try {
+                const transfer = await transfersAPI.getTransferById(id);
+                if (transfer) {                    const detailsHtml = `
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>ID:</strong> ${transfer.id}</p>
+                                <p><strong>Employee:</strong> ${transfer.employee ? `${transfer.employee.firstName} ${transfer.employee.lastName}` : 'N/A'}</p>
+                                <p><strong>Type:</strong> ${transfer.transactionType || 'N/A'}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Amount:</strong> ${formatCurrency(transfer.amount)} ${transfer.currency}</p>
+                                <p><strong>Status:</strong> ${transfer.status}</p>
+                                <p><strong>Date:</strong> ${formatDate(transfer.transactionDate)}</p>
+                                <p><strong>GL Ref Code:</strong> ${transfer.glrefcode || 'N/A'}</p>
+                                <p><strong>Description:</strong> ${transfer.description || 'N/A'}</p>
+                            </div>
+                        </div>
+                    `;
+                    document.getElementById('viewTransactionDetails').innerHTML = detailsHtml;
+                    const modal = new bootstrap.Modal(document.getElementById('viewTransactionModal'));
+                    modal.show();
+                }
+            } catch (error) {
+                alert('Error loading transaction details: ' + error.message);
+            }
+        }
+
+        async function editTransfer(id) {
+            try {
+                const transfer = await transfersAPI.getTransferById(id);
+                if (transfer) {                    document.getElementById('editTransactionId').value = transfer.id;
+                    document.getElementById('editEmployeeSelect').value = transfer.employee ? transfer.employee.id : '';
+                    document.getElementById('editRateSelect').value = transfer.rate ? transfer.rate.id : '';
+                    document.getElementById('editAmount').value = transfer.amount;
+                    document.getElementById('editTransactionType').value = transfer.transactionType || '';
+                    document.getElementById('editCurrency').value = transfer.currency || 'USD';
+                    document.getElementById('editGlrefcode').value = transfer.glrefcode || '';
+                    document.getElementById('editDescription').value = transfer.description || '';
+                    
+                    const modal = new bootstrap.Modal(document.getElementById('editTransactionModal'));
+                    modal.show();
+                }
+            } catch (error) {
+                alert('Error loading transaction: ' + error.message);
+            }
+        }
+
+        async function approveTransfer(id) {
+            const approver = prompt('Enter approver name:');
+            if (approver) {
+                try {
+                    await transfersAPI.approveTransfer(id, approver);
+                    loadTransferData();
+                    loadStatistics();
+                    alert('Transfer approved successfully!');
+                } catch (error) {
+                    alert('Error approving transfer: ' + error.message);
+                }
+            }
+        }
+
+        async function rejectTransfer(id) {
+            const rejector = prompt('Enter rejector name:');
+            if (rejector) {
+                try {
+                    await transfersAPI.rejectTransfer(id, rejector);
+                    loadTransferData();
+                    loadStatistics();
+                    alert('Transfer rejected successfully!');
+                } catch (error) {
+                    alert('Error rejecting transfer: ' + error.message);
+                }
+            }
+        }
+
+        async function processTransfer(id) {
+            const processor = prompt('Enter processor name:');
+            if (processor) {
+                try {
+                    await transfersAPI.processTransfer(id, processor);
+                    loadTransferData();
+                    loadStatistics();
+                    alert('Transfer processed successfully!');
+                } catch (error) {
+                    alert('Error processing transfer: ' + error.message);
+                }
+            }
+        }
+
+        async function deleteTransfer(id) {
+            if (confirm('Are you sure you want to delete this transfer?')) {
+                try {
+                    await transfersAPI.deleteTransfer(id);
+                    loadTransferData();
+                    loadStatistics();
+                    alert('Transfer deleted successfully!');
+                } catch (error) {
+                    alert('Error deleting transfer: ' + error.message);
+                }
+            }        }
+
+        // Filter and search functions
+        async function filterTransfers() {
+            const statusFilter = document.getElementById('statusFilter').value;
+            const employeeFilter = document.getElementById('employeeFilter').value;
+
+            try {
+                let transfers = [];
+                
+                if (statusFilter) {
+                    transfers = await transfersAPI.getTransfersByStatus(statusFilter);
+                } else if (employeeFilter) {
+                    transfers = await transfersAPI.getTransfersByEmployee(employeeFilter);
+                } else {
+                    transfers = await transfersAPI.getAllTransfers();
+                }
+                
+                displayTransfers(transfers);
+            } catch (error) {
+                console.error('Error filtering transfers:', error);
+            }
+        }
+
+        async function searchTransfers() {
+            const searchTerm = document.getElementById('searchInput').value.trim();
+            
+            if (searchTerm) {
+                try {
+                    const transfers = await transfersAPI.searchTransfers(searchTerm);
+                    displayTransfers(transfers);
+                } catch (error) {
+                    console.error('Error searching transfers:', error);
+                }
+            } else {
+                loadTransferData();
+            }
+        }
+
+        async function filterByGlrefcode() {
+            const glrefcode = document.getElementById('glrefcodeFilter').value.trim();
+            
+            if (glrefcode) {
+                try {
+                    const transfers = await transfersAPI.searchTransfersByGlrefcode(glrefcode);
+                    displayTransfers(transfers);
+                    showToast(`Filtered by GL Code: ${glrefcode}`, 'info');
+                } catch (error) {
+                    console.error('Error filtering transfers by glrefcode:', error);
+                    showToast('Error filtering by GL Reference Code', 'error');
+                }
+            } else {
+                loadTransferData();
+            }
+        }
+
+        async function searchByGlrefcode() {
+            const glrefcode = document.getElementById('glrefcodeSearch').value.trim();
+            
+            if (glrefcode) {
+                try {
+                    const transfers = await transfersAPI.searchTransfersByGlrefcode(glrefcode);
+                    displayTransfers(transfers);
+                } catch (error) {
+                    console.error('Error searching transfers by glrefcode:', error);
+                }
+            } else {
+                loadTransferData();
+            }
+        }
+
+        // Helper function to clear add transaction form
+        function clearAddTransactionForm() {
+            document.getElementById('employeeSelect').value = '';
+            document.getElementById('rateSelect').value = '';
+            document.getElementById('amount').value = '';
+            document.getElementById('transactionType').value = '';
+            document.getElementById('currency').value = 'USD';
+            document.getElementById('glrefcode').value = '';
+            document.getElementById('description').value = '';
+        }
+
+        // Selection functionality
+        let selectedTransactions = new Set();
+
+        function toggleSelectAll() {
+            const selectAllCheckbox = document.getElementById('selectAll');
+            const checkboxes = document.querySelectorAll('.transaction-checkbox');
+            
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = selectAllCheckbox.checked;
+                const transactionId = checkbox.value;
+                if (selectAllCheckbox.checked) {
+                    selectedTransactions.add(transactionId);
+                    checkbox.closest('tr').classList.add('selected-row');
+                } else {
+                    selectedTransactions.delete(transactionId);
+                    checkbox.closest('tr').classList.remove('selected-row');
+                }
+            });
+            
+            updateSelectionInfo();
+        }
+
+        function toggleTransactionSelection(checkbox, transactionId) {
+            if (checkbox.checked) {
+                selectedTransactions.add(transactionId);
+                checkbox.closest('tr').classList.add('selected-row');
+            } else {
+                selectedTransactions.delete(transactionId);
+                checkbox.closest('tr').classList.remove('selected-row');
+                document.getElementById('selectAll').checked = false;
+            }
+            
+            updateSelectionInfo();
+        }
+
+        function selectAll() {
+            document.getElementById('selectAll').checked = true;
+            toggleSelectAll();
+        }
+
+        function clearSelection() {
+            document.getElementById('selectAll').checked = false;
+            toggleSelectAll();
+        }
+
+        function updateSelectionInfo() {
+            const count = selectedTransactions.size;
+            const selectionInfo = document.getElementById('selectionInfo');
+            const selectionText = document.getElementById('selectionText');
+            const selectedCount = document.getElementById('selectedCount');
+            const printSelectedBtn = document.getElementById('printSelectedBtn');
+            const quickPrintSelected = document.getElementById('quickPrintSelected');
+            
+            // Update count displays
+            selectedCount.textContent = count;
+            selectionText.textContent = `${count} transaction${count !== 1 ? 's' : ''} selected`;
+            
+            // Show/hide selection info panel
+            if (count > 0) {
+                selectionInfo.style.display = 'block';
+                printSelectedBtn.disabled = false;
+                quickPrintSelected.disabled = false;
+                printSelectedBtn.classList.remove('disabled');
+                quickPrintSelected.classList.remove('disabled');
+            } else {
+                selectionInfo.style.display = 'none';
+                printSelectedBtn.disabled = true;
+                quickPrintSelected.disabled = true;
+                printSelectedBtn.classList.add('disabled');
+                quickPrintSelected.classList.add('disabled');
+            }
+              // Update export dropdown items
+            const exportSelectedItems = ['exportSelectedCSV', 'exportSelectedExcel', 'exportSelectedPDF', 'exportSelectedTamil', 'printSelectedDropdown'];
+            exportSelectedItems.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    if (count > 0) {
+                        element.classList.remove('disabled');
+                        element.style.pointerEvents = 'auto';
+                        element.style.opacity = '1';
+                    } else {
+                        element.classList.add('disabled');
+                        element.style.pointerEvents = 'none';
+                        element.style.opacity = '0.5';
+                    }
+                }
+            });
+        }
+
+        // Print functionality
+        function printTransactions() {
+            // Update print-specific elements with current data
+            updatePrintData('all');
+            
+            // Trigger print dialog
+            window.print();
+        }        function printSelectedTransactions() {
+            if (selectedTransactions.size === 0) {
+                alert('Please select at least one transaction to print.');
+                return;
+            }
+            
+            // Hide non-selected rows temporarily for printing
+            const allRows = document.querySelectorAll('#transfers-table-body tr');
+            const hiddenRows = [];
+            
+            allRows.forEach(row => {
+                const checkbox = row.querySelector('.transaction-checkbox');
+                if (checkbox && !selectedTransactions.has(checkbox.value)) {
+                    hiddenRows.push(row);
+                    row.style.display = 'none';
+                }
+            });
+            
+            // Update print-specific elements with selected data
+            updatePrintData('selected');
+            
+            // Trigger print dialog
+            window.print();
+            
+            // Restore hidden rows after print dialog
+            setTimeout(() => {
+                hiddenRows.forEach(row => {
+                    row.style.display = '';
+                });
+            }, 100);
+        }        function updatePrintData(mode = 'all') {
+            // Set current date and time
+            const now = new Date();
+            const dateString = now.toLocaleString();
+            document.getElementById('print-date').textContent = dateString;
+            document.getElementById('print-footer-date').textContent = dateString;
+            
+            if (mode === 'selected') {
+                // Count selected items for record count
+                let selectedCount = selectedTransactions.size;
+                
+                // Update print header for selected items
+                document.getElementById('print-record-count').textContent = selectedCount;
+                
+                // Update print title to indicate selection
+                const printTitle = document.querySelector('.print-title');
+                if (printTitle) {
+                    printTitle.textContent = `GlobalVen - Selected Transactions Report (${selectedCount} items)`;
+                }
+            } else {
+                // Update record count for all items
+                const allVisibleRows = document.querySelectorAll('#transfers-table-body tr:not([style*="display: none"])');
+                const recordCount = allVisibleRows.length > 0 && !allVisibleRows[0].querySelector('.spinner-border') ? allVisibleRows.length : 0;
+                document.getElementById('print-record-count').textContent = recordCount;
+                
+                // Reset print title
+                const printTitle = document.querySelector('.print-title');
+                if (printTitle) {
+                    printTitle.textContent = 'GlobalVen - Transaction Report';
+                }
+            }
+        }
+
+        // Export to CSV functionality
+        function exportToCSV(mode = 'all') {
+            if (mode === 'selected' && selectedTransactions.size === 0) {
+                alert('Please select at least one transaction to export.');
+                return;
+            }
+            
+            const table = document.getElementById('transactions-table');
+            const rows = table.querySelectorAll('tr');
+            let csv = [];
+            
+            // Get headers (excluding checkbox and Actions columns)
+            const headerRow = rows[0];
+            const headers = Array.from(headerRow.querySelectorAll('th:not(.no-print)'))
+                .map(th => th.textContent.trim())
+                .filter(header => header !== ''); // Remove empty headers
+            csv.push(headers.join(','));
+            
+            // Get data rows
+            for (let i = 1; i < rows.length; i++) {
+                const row = rows[i];
+                if (row.querySelector('.spinner-border')) continue; // Skip loading row
+                
+                const checkbox = row.querySelector('.transaction-checkbox');
+                
+                // Skip row if in selected mode and row is not selected
+                if (mode === 'selected' && (!checkbox || !selectedTransactions.has(checkbox.value))) {
+                    continue;
+                }
+                
+                const cells = Array.from(row.querySelectorAll('td:not(.action-buttons):not(.no-print)'))
+                    .map(td => {
+                        // Clean up cell content (remove HTML tags and extra spaces)
+                        let content = td.textContent.trim();
+                        // Handle commas in content by wrapping in quotes
+                        if (content.includes(',')) {
+                            content = `"${content}"`;
+                        }
+                        return content;
+                    })
+                    .filter((content, index) => index > 0); // Skip checkbox column
+                
+                if (cells.length > 0) {
+                    csv.push(cells.join(','));
+                }
+            }
+            
+            // Download CSV file
+            const csvContent = csv.join('\n');
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            const filename = mode === 'selected' ? 
+                `selected_transactions_${new Date().toISOString().split('T')[0]}.csv` :
+                `transactions_${new Date().toISOString().split('T')[0]}.csv`;
+            link.setAttribute('href', url);
+            link.setAttribute('download', filename);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Export to Excel functionality using SheetJS
+        function exportToExcel(mode = 'all') {
+            if (mode === 'selected' && selectedTransactions.size === 0) {
+                alert('Please select at least one transaction to export.');
+                return;
+            }
+            const table = document.getElementById('transactions-table');
+            const rows = table.querySelectorAll('tr');
+            const ws_data = [];
+            // Headers (skip checkbox & actions)
+            const headerRow = Array.from(rows[0].querySelectorAll('th:not(.no-print)'))
+                .map(th => th.textContent.trim())
+                .filter(h => h !== '');
+            ws_data.push(headerRow);
+            for (let i = 1; i < rows.length; i++) {
+                const row = rows[i];
+                if (row.querySelector('.spinner-border')) continue;
+                const checkbox = row.querySelector('.transaction-checkbox');
+                if (mode === 'selected' && (!checkbox || !selectedTransactions.has(checkbox.value))) continue;
+                const cells = Array.from(row.querySelectorAll('td:not(.action-buttons):not(.no-print)'))
+                    .map(td => td.textContent.trim())
+                    .filter((content, index) => index > 0); // skip checkbox column
+                if (cells.length > 0) ws_data.push(cells);
+            }
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.aoa_to_sheet(ws_data);
+            XLSX.utils.book_append_sheet(wb, ws, 'Transactions');
+            const filename = mode === 'selected' ?
+                `selected_transactions_${new Date().toISOString().split('T')[0]}.xlsx` :
+                `transactions_${new Date().toISOString().split('T')[0]}.xlsx`;
+            XLSX.writeFile(wb, filename);
+        }
+
+        // Export to PDF functionality (requires additional library or server-side implementation)
+        function exportToPDF(mode = 'all') {
+            if (mode === 'selected' && selectedTransactions.size === 0) {
+                alert('Please select at least one transaction to export as PDF.');
+                return;
+            }
+            
+            // For now, we'll use the browser's print to PDF functionality
+            const modeText = mode === 'selected' ? 'selected transactions' : 'all transactions';
+            alert(`To export ${modeText} as PDF:\n1. The print dialog will open\n2. Select "Save as PDF" as the destination\n3. Click "Save"`);
+            
+            if (mode === 'selected') {
+                printSelectedTransactions();
+            } else {
+                printTransactions();
+            }
+        }
+
+        // Export to Tamil Document functionality
+        function exportToTamil(mode = 'all') {
+            if (mode === 'selected' && selectedTransactions.size === 0) {
+                alert('Please select at least one transaction to export as Tamil document.');
+                return;
+            }
+
+            const table = document.getElementById('transactions-table');
+            const rows = table.querySelectorAll('tr');
+            
+            // Tamil translations for headers
+            const tamilHeaders = {
+                'Select': 'தேர்ந்தெடுக்க',
+                'ID': 'அடையாள எண்',
+                'Employee': 'பணியாளர்',
+                'Amount': 'தொகை',
+                'Description': 'விளக்கம்',
+                'Date': 'தேதி',
+                'GL Reference Code': 'ஜிஎல் குறிப்பு குறியீடு',
+                'Status': 'நிலை',
+                'Actions': 'செயல்கள்'
+            };
+            
+            // Tamil translations for status values
+            const tamilStatus = {
+                'PENDING': 'நிலுவையில்',
+                'APPROVED': 'அங்கீகரிக்கப்பட்டது',
+                'REJECTED': 'நிராகரிக்கப்பட்டது',
+                'PROCESSED': 'செயலாக்கப்பட்டது'
+            };
+
+            // Create HTML content for Tamil document
+            let htmlContent = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <title>பரிவர்த்தனை அறிக்கை - Tamil Transaction Report</title>
+                    <style>
+                        body {
+                            font-family: 'Noto Sans Tamil', Arial, sans-serif;
+                            margin: 20px;
+                            line-height: 1.6;
+                        }
+                        .header {
+                            text-align: center;
+                            margin-bottom: 30px;
+                            border-bottom: 2px solid #000;
+                            padding-bottom: 15px;
+                        }
+                        .company-name {
+                            font-size: 24px;
+                            font-weight: bold;
+                            margin-bottom: 10px;
+                        }
+                        .report-title {
+                            font-size: 20px;
+                            margin-bottom: 10px;
+                        }
+                        .report-info {
+                            font-size: 14px;
+                            color: #666;
+                        }
+                        table {
+                            width: 100%;
+                            border-collapse: collapse;
+                            margin-top: 20px;
+                            font-size: 12px;
+                        }
+                        th, td {
+                            border: 1px solid #000;
+                            padding: 8px;
+                            text-align: left;
+                        }
+                        th {
+                            background-color: #f8f9fa;
+                            font-weight: bold;
+                        }
+                        .footer {
+                            margin-top: 30px;
+                            text-align: center;
+                            font-size: 12px;
+                            border-top: 1px solid #000;
+                            padding-top: 15px;
+                        }
+                        .status-pending { color: #ffc107; }
+                        .status-approved { color: #28a745; }
+                        .status-rejected { color: #dc3545; }
+                        .status-processed { color: #17a2b8; }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <div class="company-name">GlobalVen</div>
+                        <div class="report-title">பரிவர்த்தனை அறிக்கை (Transaction Report)</div>
+                        <div class="report-info">
+                            தயாரிக்கப்பட்ட தேதி (Generated Date): ${new Date().toLocaleDateString('ta-IN')}<br>
+                            மொத்த பதிவுகள் (Total Records): <span id="record-count"></span>
+                        </div>
+                    </div>
+                    
+                    <table>
+                        <thead>
+                            <tr>`;
+
+            // Add Tamil headers (skip select and actions columns)
+            const headerRow = rows[0];
+            const headers = Array.from(headerRow.querySelectorAll('th:not(.no-print)'))
+                .map(th => th.textContent.trim())
+                .filter(header => header !== '' && header !== 'Select' && header !== 'Actions');
+            
+            headers.forEach(header => {
+                const tamilHeader = tamilHeaders[header] || header;
+                htmlContent += `<th>${tamilHeader}</th>`;
+            });
+            
+            htmlContent += `
+                            </tr>
+                        </thead>
+                        <tbody>`;
+
+            let recordCount = 0;
+            
+            // Add data rows
+            for (let i = 1; i < rows.length; i++) {
+                const row = rows[i];
+                if (row.querySelector('.spinner-border')) continue; // Skip loading row
+                
+                const checkbox = row.querySelector('.transaction-checkbox');
+                
+                // Skip row if in selected mode and row is not selected
+                if (mode === 'selected' && (!checkbox || !selectedTransactions.has(checkbox.value))) {
+                    continue;
+                }
+                
+                htmlContent += '<tr>';
+                const cells = Array.from(row.querySelectorAll('td:not(.action-buttons):not(.no-print)'))
+                    .filter((td, index) => index > 0); // Skip checkbox column
+                
+                cells.forEach((td, index) => {
+                    let content = td.textContent.trim();
+                    
+                    // Translate status values to Tamil
+                    if (headers[index] === 'Status' && tamilStatus[content]) {
+                        content = tamilStatus[content];
+                        const statusClass = `status-${content.toLowerCase()}`;
+                        htmlContent += `<td class="${statusClass}">${content}</td>`;
+                    } else {
+                        htmlContent += `<td>${content}</td>`;
+                    }
+                });
+                
+                htmlContent += '</tr>';
+                recordCount++;
+            }
+            
+            htmlContent += `
+                        </tbody>
+                    </table>
+                    
+                    <div class="footer">
+                        <p>இந்த அறிக்கை GlobalVen அமைப்பால் தானாக உருவாக்கப்பட்டது</p>
+                        <p>(This report was automatically generated by the GlobalVen system)</p>
+                        <p>தயாரிக்கப்பட்ட நேரம் (Generated Time): ${new Date().toLocaleString('ta-IN')}</p>
+                    </div>
+                </body>
+                </html>`;
+
+            // Replace record count placeholder
+            htmlContent = htmlContent.replace('<span id="record-count"></span>', recordCount.toString());
+
+            // Create and download the HTML file
+            const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            const filename = mode === 'selected' ? 
+                `selected_transactions_tamil_${new Date().toISOString().split('T')[0]}.html` :
+                `transactions_tamil_${new Date().toISOString().split('T')[0]}.html`;
+            
+            link.setAttribute('href', url);
+            link.setAttribute('download', filename);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            // Show success message in Tamil and English
+            alert(`தமிழ் ஆவணம் வெற்றிகரமாக ஏற்றுமதி செய்யப்பட்டது!\nTamil document exported successfully!\n\nFile: ${filename}`);
+        }
+
+        // Add print event listeners
+        window.addEventListener('beforeprint', function() {
+            updatePrintData();
+        });
+    </script>
+</body>
+</html>

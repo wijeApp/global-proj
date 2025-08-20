@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Country API Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .result { background: #f5f5f5; padding: 10px; margin: 10px 0; border-radius: 3px; min-height: 50px; }
+        button { padding: 8px 12px; margin: 5px; cursor: pointer; }
+        input, textarea { padding: 5px; margin: 5px; width: 200px; }
+        pre { background: #f8f8f8; padding: 10px; border-radius: 3px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>Country API CRUD Testing</h1>
+    
+    <div class="section">
+        <h3>1. GET All Countries</h3>
+        <button onclick="getAllCountries()">Get All Countries</button>
+        <div id="allCountries" class="result"></div>
+    </div>
+    
+    <div class="section">
+        <h3>2. CREATE New Country</h3>
+        <input type="text" id="newCountryName" placeholder="Country Name" />
+        <button onclick="createCountry()">Create Country</button>
+        <div id="createResult" class="result"></div>
+    </div>
+    
+    <div class="section">
+        <h3>3. GET Country by ID</h3>
+        <input type="number" id="countryId" placeholder="Country ID" />
+        <button onclick="getCountryById()">Get Country</button>
+        <div id="getByIdResult" class="result"></div>
+    </div>
+    
+    <div class="section">
+        <h3>4. UPDATE Country</h3>
+        <input type="number" id="updateId" placeholder="Country ID" />
+        <input type="text" id="updateName" placeholder="New Country Name" />
+        <button onclick="updateCountry()">Update Country</button>
+        <div id="updateResult" class="result"></div>
+    </div>
+    
+    <div class="section">
+        <h3>5. SEARCH Countries</h3>
+        <input type="text" id="searchTerm" placeholder="Search Term" />
+        <button onclick="searchCountries()">Search Countries</button>
+        <div id="searchResult" class="result"></div>
+    </div>
+    
+    <div class="section">
+        <h3>6. DELETE Country</h3>
+        <input type="number" id="deleteId" placeholder="Country ID" />
+        <button onclick="deleteCountry()">Delete Country</button>
+        <div id="deleteResult" class="result"></div>
+    </div>
+    
+    <div class="section">
+        <h3>7. BATCH Create Countries</h3>
+        <textarea id="batchCountries" placeholder='[{"countryName": "Brazil"}, {"countryName": "Mexico"}]'></textarea><br>
+        <button onclick="batchCreateCountries()">Batch Create</button>
+        <div id="batchResult" class="result"></div>
+    </div>
+    
+    <div class="section">
+        <h3>8. Statistics</h3>
+        <button onclick="getStatistics()">Get Country Statistics</button>
+        <div id="statsResult" class="result"></div>
+    </div>
+
+    <script>
+        const baseUrl = 'http://localhost:8080/api/countries';
+        
+        async function makeRequest(url, options = {}) {
+            try {
+                const response = await fetch(url, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...options.headers
+                    },
+                    ...options
+                });
+                
+                const contentType = response.headers.get('content-type');
+                let data;
+                
+                if (contentType && contentType.includes('application/json')) {
+                    data = await response.json();
+                } else {
+                    data = await response.text();
+                }
+                
+                return {
+                    status: response.status,
+                    statusText: response.statusText,
+                    data: data
+                };
+            } catch (error) {
+                return {
+                    status: 'ERROR',
+                    statusText: error.message,
+                    data: null
+                };
+            }
+        }
+        
+        function displayResult(elementId, result) {
+            const element = document.getElementById(elementId);
+            element.innerHTML = `
+                <strong>Status:</strong> ${result.status} ${result.statusText}<br>
+                <strong>Response:</strong>
+                <pre>${JSON.stringify(result.data, null, 2)}</pre>
+            `;
+        }
+        
+        async function getAllCountries() {
+            const result = await makeRequest(baseUrl);
+            displayResult('allCountries', result);
+        }
+        
+        async function createCountry() {
+            const countryName = document.getElementById('newCountryName').value;
+            if (!countryName) {
+                alert('Please enter a country name');
+                return;
+            }
+            
+            const result = await makeRequest(baseUrl, {
+                method: 'POST',
+                body: JSON.stringify({ countryName: countryName })
+            });
+            displayResult('createResult', result);
+        }
+        
+        async function getCountryById() {
+            const id = document.getElementById('countryId').value;
+            if (!id) {
+                alert('Please enter a country ID');
+                return;
+            }
+            
+            const result = await makeRequest(`${baseUrl}/${id}`);
+            displayResult('getByIdResult', result);
+        }
+        
+        async function updateCountry() {
+            const id = document.getElementById('updateId').value;
+            const name = document.getElementById('updateName').value;
+            if (!id || !name) {
+                alert('Please enter both ID and new name');
+                return;
+            }
+            
+            const result = await makeRequest(`${baseUrl}/${id}`, {
+                method: 'PUT',
+                body: JSON.stringify({ countryName: name })
+            });
+            displayResult('updateResult', result);
+        }
+        
+        async function searchCountries() {
+            const term = document.getElementById('searchTerm').value;
+            if (!term) {
+                alert('Please enter a search term');
+                return;
+            }
+            
+            const result = await makeRequest(`${baseUrl}/search?name=${encodeURIComponent(term)}`);
+            displayResult('searchResult', result);
+        }
+        
+        async function deleteCountry() {
+            const id = document.getElementById('deleteId').value;
+            if (!id) {
+                alert('Please enter a country ID');
+                return;
+            }
+            
+            const result = await makeRequest(`${baseUrl}/${id}`, {
+                method: 'DELETE'
+            });
+            displayResult('deleteResult', result);
+        }
+        
+        async function batchCreateCountries() {
+            const batchData = document.getElementById('batchCountries').value;
+            if (!batchData) {
+                alert('Please enter batch data in JSON format');
+                return;
+            }
+            
+            try {
+                const countries = JSON.parse(batchData);
+                const result = await makeRequest(`${baseUrl}/batch`, {
+                    method: 'POST',
+                    body: JSON.stringify(countries)
+                });
+                displayResult('batchResult', result);
+            } catch (error) {
+                alert('Invalid JSON format');
+            }
+        }
+        
+        async function getStatistics() {
+            const result = await makeRequest(`${baseUrl}/counts`);
+            displayResult('statsResult', result);
+        }
+        
+        // Load countries on page load
+        window.onload = function() {
+            getAllCountries();
+        };
+    </script>
+</body>
+</html>

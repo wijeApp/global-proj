@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GlobalVen - Employee Management System</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <!-- Navigation Menu -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-building"></i> GlobalVen
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/">
+                            <i class="bi bi-house-door"></i> Home
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="masterSettingsDropdown" role="button" 
+                           data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-gear"></i> Master Settings
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="masterSettingsDropdown">
+                            <li>
+                                <a class="dropdown-item" href="/employees">
+                                    <i class="bi bi-people"></i> Employees
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="/users">
+                                    <i class="bi bi-person-gear"></i> User Management
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item" href="/categories">
+                                    <i class="bi bi-tags"></i> Categories
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="/rates">
+                                    <i class="bi bi-currency-dollar"></i> Rates
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item" href="/departments">
+                                    <i class="bi bi-building"></i> Departments
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="/positions">
+                                    <i class="bi bi-briefcase"></i> Positions
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item" href="/system-settings">
+                                    <i class="bi bi-sliders"></i> System Settings
+                                </a>
+                            </li>
+                        </ul>                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="transactionsDropdown" role="button" 
+                           data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-receipt"></i> Transactions
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="transactionsDropdown">
+                            <li>
+                                <a class="dropdown-item" href="/transactions">
+                                    <i class="bi bi-receipt-cutoff"></i> Manage Transfers
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item" href="/expenses">
+                                    <i class="bi bi-credit-card"></i> Manage Expenses
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="/reports">
+                                    <i class="bi bi-graph-up"></i> Transaction Reports
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/about">
+                            <i class="bi bi-info-circle"></i> About
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section text-center py-5 bg-light">
+        <div class="container">
+            <h1 class="display-4 fw-bold text-primary mb-3">Welcome to GlobalVen</h1>
+            <p class="lead text-muted mb-4">
+                Your comprehensive Employee Management System for efficient workforce management
+            </p>
+            <div class="d-flex justify-content-center gap-3">
+                <a href="/employees" class="btn btn-primary btn-lg">
+                    <i class="bi bi-people-fill"></i> Manage Employees
+                </a>
+                <a href="/about" class="btn btn-outline-primary btn-lg">
+                    <i class="bi bi-info-circle"></i> Learn More
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section py-5">
+        <div class="container">
+            <h2 class="text-center mb-5">Key Features</h2>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body text-center">
+                            <div class="feature-icon mb-3">
+                                <i class="bi bi-people-fill text-primary" style="font-size: 3rem;"></i>
+                            </div>
+                            <h5 class="card-title">Employee Management</h5>
+                            <p class="card-text">
+                                Efficiently manage your workforce with comprehensive employee profiles, 
+                                including personal details, departments, and positions.
+                            </p>
+                            <a href="/employees" class="btn btn-outline-primary">Manage Employees</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body text-center">
+                            <div class="feature-icon mb-3">
+                                <i class="bi bi-tags-fill text-success" style="font-size: 3rem;"></i>
+                            </div>
+                            <h5 class="card-title">Category Organization</h5>
+                            <p class="card-text">
+                                Organize employees into meaningful categories for better management 
+                                and streamlined operations across your organization.
+                            </p>
+                            <a href="/categories" class="btn btn-outline-success">View Categories</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body text-center">
+                            <div class="feature-icon mb-3">
+                                <i class="bi bi-currency-dollar text-info" style="font-size: 3rem;"></i>
+                            </div>
+                            <h5 class="card-title">Rate Management</h5>
+                            <p class="card-text">
+                                Set and manage different pay rates for various employee categories, 
+                                ensuring fair and transparent compensation structures.
+                            </p>
+                            <a href="/rates" class="btn btn-outline-info">Manage Rates</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Statistics Section -->
+    <section class="stats-section py-5 bg-light">
+        <div class="container">
+            <div class="row text-center">
+                <div class="col-md-3 mb-3">
+                    <div class="stat-card">
+                        <h3 class="text-primary fw-bold">150+</h3>
+                        <p class="text-muted">Total Employees</p>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="stat-card">
+                        <h3 class="text-success fw-bold">8</h3>
+                        <p class="text-muted">Categories</p>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="stat-card">
+                        <h3 class="text-info fw-bold">12</h3>
+                        <p class="text-muted">Rate Types</p>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="stat-card">
+                        <h3 class="text-warning fw-bold">5</h3>
+                        <p class="text-muted">Departments</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-4 mt-5">
+        <div class="container text-center">
+            <p class="mb-0">&copy; 2024 GlobalVen. All rights reserved.</p>
+            <p class="small text-muted">Employee Management System</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

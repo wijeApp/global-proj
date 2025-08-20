@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GL Reference Code API Test Results</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 20px; 
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h1 { 
+            color: #2c3e50; 
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 15px;
+        }
+        .test-section { 
+            margin: 30px 0; 
+            padding: 20px; 
+            border: 1px solid #e9ecef; 
+            border-radius: 8px;
+            background: #f8f9fa;
+        }
+        .test-section h2 {
+            color: #495057;
+            margin-bottom: 15px;
+            border-left: 4px solid #007bff;
+            padding-left: 15px;
+        }
+        .result { 
+            margin: 15px 0; 
+            padding: 15px; 
+            border-radius: 6px;
+            min-height: 50px;
+        }
+        .success { 
+            background: #d4edda; 
+            color: #155724; 
+            border: 1px solid #c3e6cb;
+        }
+        .error { 
+            background: #f8d7da; 
+            color: #721c24; 
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        button { 
+            padding: 12px 20px; 
+            margin: 8px; 
+            background: #007bff; 
+            color: white; 
+            border: none; 
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.3s;
+        }
+        button:hover { 
+            background: #0056b3; 
+        }
+        button:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+        select { 
+            padding: 10px; 
+            width: 100%; 
+            max-width: 500px; 
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        pre { 
+            background: #f8f9fa; 
+            padding: 15px; 
+            overflow-x: auto; 
+            border-radius: 5px;
+            border: 1px solid #e9ecef;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+        .stats {
+            display: flex;
+            gap: 20px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            min-width: 150px;
+            flex: 1;
+        }
+        .stat-card h3 {
+            margin: 0;
+            font-size: 2em;
+            font-weight: bold;
+        }
+        .stat-card p {
+            margin: 5px 0 0 0;
+            opacity: 0.9;
+        }
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .dropdown-demo {
+            margin: 20px 0;
+            padding: 20px;
+            background: #fff;
+            border: 2px solid #007bff;
+            border-radius: 8px;
+        }
+        .dropdown-demo h3 {
+            color: #007bff;
+            margin-bottom: 15px;
+        }
+        #glCodeSelect option {
+            padding: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 GL Reference Code API Test Results</h1>
+        
+        <div class="stats" id="statsContainer" style="display: none;">
+            <div class="stat-card">
+                <h3 id="totalCount">-</h3>
+                <p>Total Records</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="statusCount">-</h3>
+                <p>Connection Status</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="endpointCount">-</h3>
+                <p>Endpoints Tested</p>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>🔌 Test 1: SQL Server Connection</h2>
+            <p>Testing the public endpoint that verifies SQL Server connectivity for GL Reference Codes.</p>
+            <button onclick="testConnection()">🧪 Test Connection</button>
+            <div id="connectionResult" class="result info">
+                <div class="loading"></div> Ready to test...
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>📋 Test 2: Load GL Codes for Dropdown (New Endpoint)</h2>
+            <p>Testing the new authenticated endpoint designed for populating frontend dropdowns.</p>
+            <button onclick="loadActiveGlCodes()">📥 Load Dropdown Data</button>
+            <div id="activeCodesResult" class="result info">
+                <div class="loading"></div> Ready to test...
+            </div>
+            
+            <div class="dropdown-demo" id="dropdownDemo" style="display: none;">
+                <h3>📋 Dropdown Preview</h3>
+                <label for="glCodeSelect">GL Reference Code:</label>
+                <select id="glCodeSelect">
+                    <option value="">Select GL Reference Code</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>🔐 Test 3: Admin-Only Endpoint</h2>
+            <p>Testing the restricted endpoint that requires admin roles.</p>
+            <button onclick="loadAllActiveGlCodes()">🔐 Load All Active Codes</button>
+            <div id="allActiveCodesResult" class="result info">
+                <div class="loading"></div> Ready to test...
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>🔍 Test 4: Search Functionality</h2>
+            <p>Testing the search endpoint for GL Reference Codes.</p>
+            <input type="text" id="searchTerm" placeholder="Enter search term (e.g., 'office')" style="width: 300px; padding: 8px; margin-right: 10px;">
+            <button onclick="searchGlCodes()">🔍 Search</button>
+            <div id="searchResult" class="result info">
+                <div class="loading"></div> Ready to test...
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>📊 Summary</h2>
+            <div id="summaryResult" class="result info">
+                Run tests to see summary...
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let testResults = {
+            connection: null,
+            dropdown: null,
+            admin: null,
+            search: null
+        };
+
+        async function testConnection() {
+            const resultDiv = document.getElementById('connectionResult');
+            resultDiv.className = 'result info';
+            resultDiv.innerHTML = '<div class="loading"></div> Testing SQL Server connection...';
+            
+            try {
+                const response = await fetch('/api/glref-codes/test-connection');
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.className = 'result success';
+                    resultDiv.innerHTML = `
+                        <strong>✅ Connection Successful!</strong><br>
+                        📊 Records found: <strong>${data.recordCount}</strong><br>
+                        🗄️ Database: ${data.database}<br>
+                        ⚙️ Stored Procedure: ${data.storedProcedure}<br>
+                        📅 Status: ${data.status}
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                    testResults.connection = true;
+                    updateStats(data.recordCount);
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.innerHTML = `<strong>❌ Error:</strong> ${data.message || 'Unknown error'}`;
+                    testResults.connection = false;
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `<strong>❌ Network Error:</strong> ${error.message}`;
+                testResults.connection = false;
+            }
+            updateSummary();
+        }
+
+        async function loadActiveGlCodes() {
+            const resultDiv = document.getElementById('activeCodesResult');
+            const selectElement = document.getElementById('glCodeSelect');
+            const dropdownDemo = document.getElementById('dropdownDemo');
+            
+            resultDiv.className = 'result info';
+            resultDiv.innerHTML = '<div class="loading"></div> Loading GL codes for dropdown...';
+            
+            try {
+                const response = await fetch('/api/glref-codes/active-for-dropdown');
+                const data = await response.json();
+                
+                if (response.ok && Array.isArray(data)) {
+                    resultDiv.className = 'result success';
+                    resultDiv.innerHTML = `
+                        <strong>✅ GL Codes Loaded Successfully!</strong><br>
+                        📊 Records found: <strong>${data.length}</strong><br>
+                        🎯 Endpoint: /api/glref-codes/active-for-dropdown<br>
+                        📋 Sample data preview:
+                        <pre>${JSON.stringify(data.slice(0, 3), null, 2)}${data.length > 3 ? '\\n... (showing first 3 of ' + data.length + ' records)' : ''}</pre>
+                    `;
+                    
+                    // Populate the dropdown
+                    selectElement.innerHTML = '<option value="">Select GL Reference Code</option>';
+                    data.forEach(code => {
+                        const option = document.createElement('option');
+                        option.value = code.code;
+                        // Format: "CODE - Description (Category)"
+                        option.textContent = `${code.code} - ${code.description}${code.category ? ' (' + code.category + ')' : ''}`;
+                        selectElement.appendChild(option);
+                    });
+                    dropdownDemo.style.display = 'block';
+                    testResults.dropdown = true;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.innerHTML = `<strong>❌ Error:</strong> ${response.status} - ${data.message || 'Invalid response format'}`;
+                    testResults.dropdown = false;
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `<strong>❌ Network Error:</strong> ${error.message}`;
+                testResults.dropdown = false;
+            }
+            updateSummary();
+        }
+
+        async function loadAllActiveGlCodes() {
+            const resultDiv = document.getElementById('allActiveCodesResult');
+            resultDiv.className = 'result info';
+            resultDiv.innerHTML = '<div class="loading"></div> Loading all active GL codes (Admin access)...';
+            
+            try {
+                const response = await fetch('/api/glref-codes/active');
+                const data = await response.json();
+                
+                if (response.ok && Array.isArray(data)) {
+                    resultDiv.className = 'result success';
+                    resultDiv.innerHTML = `
+                        <strong>✅ All Active GL Codes Loaded!</strong><br>
+                        📊 Records found: <strong>${data.length}</strong><br>
+                        🔐 Admin endpoint access successful<br>
+                        📋 Sample data:
+                        <pre>${JSON.stringify(data.slice(0, 2), null, 2)}${data.length > 2 ? '\\n... (showing first 2 of ' + data.length + ' records)' : ''}</pre>
+                    `;
+                    testResults.admin = true;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.innerHTML = `<strong>❌ Error:</strong> ${response.status} - ${data.message || 'Access denied or invalid response'}`;
+                    testResults.admin = false;
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `<strong>❌ Network Error:</strong> ${error.message}`;
+                testResults.admin = false;
+            }
+            updateSummary();
+        }
+
+        async function searchGlCodes() {
+            const searchTerm = document.getElementById('searchTerm').value.trim();
+            const resultDiv = document.getElementById('searchResult');
+            
+            if (!searchTerm) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = '<strong>⚠️ Please enter a search term</strong>';
+                return;
+            }
+            
+            resultDiv.className = 'result info';
+            resultDiv.innerHTML = '<div class="loading"></div> Searching GL codes...';
+            
+            try {
+                const response = await fetch(`/api/glref-codes/search?searchTerm=${encodeURIComponent(searchTerm)}`);
+                const data = await response.json();
+                
+                if (response.ok && Array.isArray(data)) {
+                    resultDiv.className = 'result success';
+                    resultDiv.innerHTML = `
+                        <strong>✅ Search Results!</strong><br>
+                        🔍 Search term: "${searchTerm}"<br>
+                        📊 Matches found: <strong>${data.length}</strong><br>
+                        📋 Results:
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                    testResults.search = true;
+                } else if (response.status === 204) {
+                    resultDiv.className = 'result info';
+                    resultDiv.innerHTML = `<strong>🔍 No Results:</strong> No GL codes found matching "${searchTerm}"`;
+                    testResults.search = true;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.innerHTML = `<strong>❌ Error:</strong> ${response.status} - ${data.message || 'Search failed'}`;
+                    testResults.search = false;
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `<strong>❌ Network Error:</strong> ${error.message}`;
+                testResults.search = false;
+            }
+            updateSummary();
+        }
+
+        function updateStats(recordCount = 0) {
+            document.getElementById('totalCount').textContent = recordCount;
+            document.getElementById('statusCount').textContent = '✅';
+            document.getElementById('endpointCount').textContent = Object.values(testResults).filter(r => r !== null).length;
+            document.getElementById('statsContainer').style.display = 'flex';
+        }
+
+        function updateSummary() {
+            const summaryDiv = document.getElementById('summaryResult');
+            const completedTests = Object.values(testResults).filter(r => r !== null).length;
+            const passedTests = Object.values(testResults).filter(r => r === true).length;
+            
+            if (completedTests === 0) return;
+            
+            summaryDiv.className = completedTests === 4 ? (passedTests === 4 ? 'result success' : 'result error') : 'result info';
+            summaryDiv.innerHTML = `
+                <strong>📊 Test Summary</strong><br>
+                🧪 Tests completed: ${completedTests}/4<br>
+                ✅ Tests passed: ${passedTests}<br>
+                ❌ Tests failed: ${completedTests - passedTests}<br><br>
+                📋 Results breakdown:<br>
+                • SQL Server Connection: ${getTestStatus(testResults.connection)}<br>
+                • Dropdown Endpoint: ${getTestStatus(testResults.dropdown)}<br>
+                • Admin Endpoint: ${getTestStatus(testResults.admin)}<br>
+                • Search Functionality: ${getTestStatus(testResults.search)}
+            `;
+        }
+
+        function getTestStatus(result) {
+            if (result === true) return '✅ PASS';
+            if (result === false) return '❌ FAIL';
+            return '⏳ PENDING';
+        }
+
+        // Auto-run connection test on page load
+        window.addEventListener('load', () => {
+            setTimeout(testConnection, 1000);
+        });
+    </script>
+</body>
+</html>

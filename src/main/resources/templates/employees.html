@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employees - GlobalVen</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <!-- Navigation Menu -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-building"></i> GlobalVen
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">
+                            <i class="bi bi-house-door"></i> Home
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle active" href="#" id="masterSettingsDropdown" role="button" 
+                           data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-gear"></i> Master Settings
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="masterSettingsDropdown">
+                            <li>
+                                <a class="dropdown-item active" href="/employees">
+                                    <i class="bi bi-people"></i> Employees
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item" href="/categories">
+                                    <i class="bi bi-tags"></i> Categories
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="/rates">
+                                    <i class="bi bi-currency-dollar"></i> Rates
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="/country">
+                                    <i class="bi bi-globe"></i> Country
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item" href="/departments">
+                                    <i class="bi bi-building"></i> Departments
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="/positions">
+                                    <i class="bi bi-briefcase"></i> Positions
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item" href="/system-settings">
+                                    <i class="bi bi-sliders"></i> System Settings
+                                </a>
+                            </li>
+                        </ul>                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="transactionsDropdown" role="button" 
+                           data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-receipt"></i> Transactions
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="transactionsDropdown">
+                            <li>
+                                <a class="dropdown-item" href="/transactions">
+                                    <i class="bi bi-receipt-cutoff"></i> Manage Transfers
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item" href="/expenses">
+                                    <i class="bi bi-credit-card"></i> Manage Expenses
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="/reports">
+                                    <i class="bi bi-graph-up"></i> Transaction Reports
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/about">
+                            <i class="bi bi-info-circle"></i> About
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="container">
+            <h1><i class="bi bi-people-fill"></i> Employee Management</h1>
+            <p class="lead">Manage your workforce efficiently</p>
+        </div>
+    </div>
+
+    <!-- Content Section -->
+    <section class="content-section">
+        <div class="container">
+            <!-- Search and Filter Section -->
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Search employees..." id="searchEmployee" onkeyup="searchEmployees()">
+                        <button class="btn btn-outline-secondary" onclick="searchEmployees()">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select" id="filterDepartment" onchange="filterByDepartment()">
+                        <option value="">All Departments</option>
+                        <option value="IT">IT</option>
+                        <option value="HR">HR</option>
+                        <option value="Sales">Sales</option>
+                        <option value="Marketing">Marketing</option>
+                        <option value="Finance">Finance</option>
+                    </select>
+                </div>
+                <div class="col-md-5 text-end">
+                    <button class="btn btn-primary" onclick="showAddEmployeeModal()">
+                        <i class="bi bi-person-plus"></i> Add New Employee
+                    </button>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Department</th>
+                                    <th>Position</th>
+                                    <th>Salary</th>
+                                    <th>Country</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="employee-table-body">
+                                <tr>
+                                    <td colspan="8" class="text-center">
+                                        <div class="spinner-border text-primary" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Add Employee Modal -->
+    <div class="modal fade" id="addEmployeeModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add New Employee</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addEmployeeForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">First Name</label>
+                                <input type="text" class="form-control" id="addFirstName" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Last Name</label>
+                                <input type="text" class="form-control" id="addLastName" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Email</label>
+                                <input type="email" class="form-control" id="addEmail" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Phone Number</label>
+                                <input type="tel" class="form-control" id="addPhone">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Department</label>
+                                <select class="form-select" id="addDepartment">
+                                    <option value="">Select Department</option>
+                                    <option value="IT">IT</option>
+                                    <option value="HR">HR</option>
+                                    <option value="Sales">Sales</option>
+                                    <option value="Marketing">Marketing</option>
+                                    <option value="Finance">Finance</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Position</label>
+                                <input type="text" class="form-control" id="addPosition">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Country</label>
+                                <select class="form-select" id="addCountry">
+                                    <option value="">Select Country</option>
+                                    <!-- Countries will be populated dynamically from API -->
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Salary</label>
+                                <input type="number" class="form-control" id="addSalary" step="0.01">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Hire Date</label>
+                                <input type="date" class="form-control" id="addHireDate">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Join Date</label>
+                                <input type="date" class="form-control" id="addJoinDate">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Rate Category</label>
+                                <input type="text" class="form-control" id="addRateCategory">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Employee Image</label>
+                                <input type="file" class="form-control" id="addEmployeeImageFile" accept="image/*" onchange="previewImage(this, 'addEmployeeImagePreview')">
+                                <div id="addEmployeeImagePreview" class="mt-2" style="display: none;">
+                                    <img class="img-thumbnail" style="max-width: 150px; max-height: 150px;">
+                                </div>
+                                <input type="hidden" id="addEmployeeImage">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Profile Image</label>
+                                <input type="file" class="form-control" id="addImageFile" accept="image/*" onchange="previewImage(this, 'addImagePreview')">
+                                <div id="addImagePreview" class="mt-2" style="display: none;">
+                                    <img class="img-thumbnail" style="max-width: 150px; max-height: 150px;">
+                                </div>
+                                <input type="hidden" id="addImage">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="addEmployee()">Add Employee</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Employee Modal -->
+    <div class="modal fade" id="editEmployeeModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Employee</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editEmployeeForm">
+                        <input type="hidden" id="editEmployeeId">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">First Name</label>
+                                <input type="text" class="form-control" id="editFirstName" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Last Name</label>
+                                <input type="text" class="form-control" id="editLastName" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Email</label>
+                                <input type="email" class="form-control" id="editEmail" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Phone Number</label>
+                                <input type="tel" class="form-control" id="editPhone">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Department</label>
+                                <select class="form-select" id="editDepartment">
+                                    <option value="">Select Department</option>
+                                    <option value="IT">IT</option>
+                                    <option value="HR">HR</option>
+                                    <option value="Sales">Sales</option>
+                                    <option value="Marketing">Marketing</option>
+                                    <option value="Finance">Finance</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Position</label>
+                                <input type="text" class="form-control" id="editPosition">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Country</label>
+                                <select class="form-select" id="editCountry">
+                                    <option value="">Select Country</option>
+                                    <!-- Countries will be populated dynamically from API -->
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Salary</label>
+                                <input type="number" class="form-control" id="editSalary" step="0.01">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Hire Date</label>
+                                <input type="date" class="form-control" id="editHireDate">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Join Date</label>
+                                <input type="date" class="form-control" id="editJoinDate">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Rate Category</label>
+                                <input type="text" class="form-control" id="editRateCategory">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Employee Image</label>
+                                <input type="file" class="form-control" id="editEmployeeImageFile" accept="image/*" onchange="previewImage(this, 'editEmployeeImagePreview')">
+                                <div id="editEmployeeImagePreview" class="mt-2" style="display: none;">
+                                    <img class="img-thumbnail" style="max-width: 150px; max-height: 150px;">
+                                </div>
+                                <input type="hidden" id="editEmployeeImage">
+                                <div class="mt-2" id="editEmployeeImageCurrent" style="display: none;">
+                                    <small class="text-muted">Current image:</small><br>
+                                    <img class="img-thumbnail" style="max-width: 100px; max-height: 100px;">
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Profile Image</label>
+                                <input type="file" class="form-control" id="editImageFile" accept="image/*" onchange="previewImage(this, 'editImagePreview')">
+                                <div id="editImagePreview" class="mt-2" style="display: none;">
+                                    <img class="img-thumbnail" style="max-width: 150px; max-height: 150px;">
+                                </div>
+                                <input type="hidden" id="editImage">
+                                <div class="mt-2" id="editImageCurrent" style="display: none;">
+                                    <small class="text-muted">Current image:</small><br>
+                                    <img class="img-thumbnail" style="max-width: 100px; max-height: 100px;">
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="updateEmployee()">Update Employee</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Employee Modal -->
+    <div class="modal fade" id="viewEmployeeModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Employee Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="viewEmployeeDetails">
+                    <!-- Employee details will be loaded here -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-4 mt-5">
+        <div class="container text-center">
+            <p class="mb-0">&copy; 2024 GlobalVen. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Employee Management JavaScript -->
+    <script>
+        // Employee API Service
+        class EmployeeAPI {
+            constructor() {
+                this.baseUrl = '/api/employees';
+            }
+
+            async getAllEmployees() {
+                try {
+                    const response = await fetch(this.baseUrl);
+                    if (!response.ok) throw new Error('Failed to fetch employees');
+                    return await response.json();
+                } catch (error) {
+                    console.error('Error fetching employees:', error);
+                    return [];
+                }
+            }
+
+            async getEmployeeById(id) {
+                try {
+                    const response = await fetch(`${this.baseUrl}/${id}`);
+                    if (!response.ok) throw new Error('Employee not found');
+                    return await response.json();
+                } catch (error) {
+                    console.error('Error fetching employee:', error);
+                    return null;
+                }
+            }
+
+            async createEmployee(employeeData) {
+                try {
+                    const response = await fetch(this.baseUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(employeeData)
+                    });
+                    if (response.status === 409) throw new Error('Email already exists');
+                    if (!response.ok) throw new Error('Failed to create employee');
+                    return await response.json();
+                } catch (error) {
+                    console.error('Error creating employee:', error);
+                    throw error;
+                }
+            }
+
+            async updateEmployee(id, employeeData) {
+                try {
+                    const response = await fetch(`${this.baseUrl}/${id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(employeeData)
+                    });
+                    if (!response.ok) throw new Error('Failed to update employee');
+                    return await response.json();
+                } catch (error) {
+                    console.error('Error updating employee:', error);
+                    throw error;
+                }
+            }
+
+            async deleteEmployee(id) {
+                try {
+                    const response = await fetch(`${this.baseUrl}/${id}`, { method: 'DELETE' });
+                    if (!response.ok) throw new Error('Failed to delete employee');
+                    return true;
+                } catch (error) {
+                    console.error('Error deleting employee:', error);
+                    throw error;
+                }
+            }
+
+            async searchByName(name) {
+                try {
+                    const response = await fetch(`${this.baseUrl}/search/name?name=${encodeURIComponent(name)}`);
+                    if (!response.ok) throw new Error('Search failed');
+                    return await response.json();
+                } catch (error) {
+                    console.error('Error searching employees:', error);
+                    return [];
+                }
+            }
+
+            async getByDepartment(department) {
+                try {
+                    const response = await fetch(`${this.baseUrl}/department/${encodeURIComponent(department)}`);
+                    if (!response.ok) throw new Error('Failed to fetch by department');
+                    return await response.json();
+                } catch (error) {
+                    console.error('Error fetching by department:', error);
+                    return [];
+                }
+            }
+        }
+
+        // Initialize API
+        const employeeAPI = new EmployeeAPI();
+        
+        // File Upload API Service
+        class FileUploadAPI {
+            constructor() {
+                this.baseUrl = '/api/files';
+            }
+
+            async uploadImage(file) {
+                try {
+                    const formData = new FormData();
+                    formData.append('file', file);
+
+                    const response = await fetch(`${this.baseUrl}/upload/image`, {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.error || 'Upload failed');
+                    }
+
+                    return await response.json();
+                } catch (error) {
+                    console.error('Error uploading image:', error);
+                    throw error;
+                }
+            }
+
+            async deleteImage(filename) {
+                try {
+                    const response = await fetch(`${this.baseUrl}/images/${filename}`, {
+                        method: 'DELETE'
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Failed to delete image');
+                    }
+
+                    return await response.json();
+                } catch (error) {
+                    console.error('Error deleting image:', error);
+                    throw error;
+                }
+            }
+        }
+
+        // Initialize File Upload API
+        const fileUploadAPI = new FileUploadAPI();
+
+        // Country API Service
+        class CountryAPI {
+            constructor() {
+                this.baseUrl = '/api/countries';
+            }
+
+            async getAllCountries() {
+                try {
+                    const response = await fetch(this.baseUrl);
+                    if (response.status === 204) {
+                        // No content - empty list
+                        return [];
+                    }
+                    if (!response.ok) throw new Error('Failed to fetch countries');
+                    return await response.json();
+                } catch (error) {
+                    console.error('Error fetching countries:', error);
+                    return [];
+                }
+            }
+        }
+
+        // Initialize Country API
+        const countryAPI = new CountryAPI();
+
+        // Global countries array
+        let countries = [];
+
+        // Load employees and countries on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadEmployeeData();
+            loadCountries();
+        });
+
+        async function loadEmployeeData() {
+            try {
+                const employees = await employeeAPI.getAllEmployees();
+                displayEmployees(employees);
+            } catch (error) {
+                console.error('Error loading employees:', error);
+                document.getElementById('employee-table-body').innerHTML = 
+                    '<tr><td colspan="8" class="text-center text-danger">Error loading employees</td></tr>';
+            }
+        }
+
+        async function loadCountries() {
+            try {
+                countries = await countryAPI.getAllCountries();
+                populateCountryDropdowns();
+            } catch (error) {
+                console.error('Error loading countries:', error);
+                // If API fails, show a basic error message but don't break the form
+            }
+        }
+
+        function populateCountryDropdowns() {
+            const addCountrySelect = document.getElementById('addCountry');
+            const editCountrySelect = document.getElementById('editCountry');
+            
+            // Clear existing options (except the first "Select Country" option)
+            addCountrySelect.innerHTML = '<option value="">Select Country</option>';
+            editCountrySelect.innerHTML = '<option value="">Select Country</option>';
+            
+            // Add countries from API
+            countries.forEach(country => {
+                const addOption = document.createElement('option');
+                addOption.value = country.countryName;
+                addOption.textContent = country.countryName;
+                addCountrySelect.appendChild(addOption);
+                
+                const editOption = document.createElement('option');
+                editOption.value = country.countryName;
+                editOption.textContent = country.countryName;
+                editCountrySelect.appendChild(editOption);
+            });
+        }
+
+        function displayEmployees(employees) {
+            const tbody = document.getElementById('employee-table-body');
+            if (!tbody) return;
+
+            if (employees.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" class="text-center">No employees found</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = employees.map(employee => `
+                <tr>
+                    <td>
+                        <span class="badge bg-secondary">${employee.id}</span>
+                    </td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            ${employee.image ? `<img src="${employee.image}" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover;" alt="Profile" onerror="this.style.display='none'">` : ''}
+                            <div>
+                                <div class="fw-semibold">${employee.firstName} ${employee.lastName}</div>
+                                ${employee.rateCategory ? `<small class="text-muted">${employee.rateCategory}</small>` : ''}
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div>${employee.email}</div>
+                        ${employee.phoneNumber ? `<small class="text-muted">${employee.phoneNumber}</small>` : ''}
+                    </td>
+                    <td>
+                        <span class="badge bg-primary">${employee.department || 'N/A'}</span>
+                    </td>
+                    <td>${employee.position || 'N/A'}</td>
+                    <td>
+                        ${employee.salary ? `<strong>${employee.salary.toLocaleString()}</strong>` : 'N/A'}
+                    </td>
+                    <td>${employee.country || 'N/A'}</td>
+                    <td>
+                        <button class="btn btn-sm btn-info" onclick="viewEmployee(${employee.id})" title="View">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                        <button class="btn btn-sm btn-warning" onclick="editEmployee(${employee.id})" title="Edit">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteEmployee(${employee.id})" title="Delete">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function showAddEmployeeModal() {
+            clearAddEmployeeForm();
+            // Ensure countries are populated in the dropdown
+            if (countries.length === 0) {
+                await loadCountries();
+            } else {
+                populateCountryDropdowns();
+            }
+            const modal = new bootstrap.Modal(document.getElementById('addEmployeeModal'));
+            modal.show();
+        }
+
+        async function addEmployee() {
+            try {
+                // Show loading state
+                const addButton = document.querySelector('#addEmployeeModal .btn-primary');
+                const originalText = addButton.textContent;
+                addButton.textContent = 'Uploading...';
+                addButton.disabled = true;
+
+                // Upload images if selected
+                let employeeImageUrl = null;
+                let profileImageUrl = null;
+
+                const employeeImageFile = document.getElementById('addEmployeeImageFile').files[0];
+                const profileImageFile = document.getElementById('addImageFile').files[0];
+
+                if (employeeImageFile) {
+                    const uploadResult = await fileUploadAPI.uploadImage(employeeImageFile);
+                    employeeImageUrl = uploadResult.url;
+                }
+
+                if (profileImageFile) {
+                    const uploadResult = await fileUploadAPI.uploadImage(profileImageFile);
+                    profileImageUrl = uploadResult.url;
+                }
+
+                // Create employee data
+                const employeeData = {
+                    firstName: document.getElementById('addFirstName').value,
+                    lastName: document.getElementById('addLastName').value,
+                    email: document.getElementById('addEmail').value,
+                    phoneNumber: document.getElementById('addPhone').value,
+                    department: document.getElementById('addDepartment').value,
+                    position: document.getElementById('addPosition').value,
+                    country: document.getElementById('addCountry').value,
+                    salary: parseFloat(document.getElementById('addSalary').value) || null,
+                    hireDate: document.getElementById('addHireDate').value || null,
+                    joinDate: document.getElementById('addJoinDate').value || null,
+                    rateCategory: document.getElementById('addRateCategory').value,
+                    employeeImage: employeeImageUrl,
+                    image: profileImageUrl
+                };
+
+                await employeeAPI.createEmployee(employeeData);
+                bootstrap.Modal.getInstance(document.getElementById('addEmployeeModal')).hide();
+                clearAddEmployeeForm();
+                loadEmployeeData();
+                alert('Employee added successfully!');
+
+            } catch (error) {
+                alert('Error adding employee: ' + error.message);
+            } finally {
+                // Reset button state
+                const addButton = document.querySelector('#addEmployeeModal .btn-primary');
+                addButton.textContent = 'Add Employee';
+                addButton.disabled = false;
+            }
+        }
+
+        async function viewEmployee(id) {
+            try {
+                const employee = await employeeAPI.getEmployeeById(id);
+                if (employee) {
+                    const detailsHtml = `
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Name:</strong> ${employee.firstName} ${employee.lastName}</p>
+                                <p><strong>Email:</strong> ${employee.email}</p>
+                                <p><strong>Phone:</strong> ${employee.phoneNumber || 'N/A'}</p>
+                                <p><strong>Department:</strong> ${employee.department || 'N/A'}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Position:</strong> ${employee.position || 'N/A'}</p>
+                                <p><strong>Country:</strong> ${employee.country || 'N/A'}</p>
+                                <p><strong>Salary:</strong> ${employee.salary ? employee.salary.toFixed(2) : 'N/A'}</p>
+                                <p><strong>Hire Date:</strong> ${employee.hireDate || 'N/A'}</p>
+                                <p><strong>Join Date:</strong> ${employee.joinDate || 'N/A'}</p>
+                                <p><strong>Rate Category:</strong> ${employee.rateCategory || 'N/A'}</p>
+                            </div>
+                        </div>
+                        ${employee.image || employee.employeeImage ? `
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <h6>Profile Images:</h6>
+                                ${employee.image ? `<div class="mb-2"><strong>Profile Image:</strong><br><img src="${employee.image}" class="img-thumbnail" style="max-width: 200px; max-height: 200px;" alt="Profile Image" onerror="this.style.display='none'"></div>` : ''}
+                                ${employee.employeeImage ? `<div class="mb-2"><strong>Employee Image:</strong><br><img src="${employee.employeeImage}" class="img-thumbnail" style="max-width: 200px; max-height: 200px;" alt="Employee Image" onerror="this.style.display='none'"></div>` : ''}
+                            </div>
+                        </div>
+                        ` : ''}
+                            </div>
+                        </div>
+                    `;
+                    document.getElementById('viewEmployeeDetails').innerHTML = detailsHtml;
+                    const modal = new bootstrap.Modal(document.getElementById('viewEmployeeModal'));
+                    modal.show();
+                }
+            } catch (error) {
+                alert('Error loading employee details: ' + error.message);
+            }
+        }
+
+        async function editEmployee(id) {
+            try {
+                // Clear form first
+                clearEditEmployeeForm();
+                
+                // Ensure countries are populated in the dropdown
+                if (countries.length === 0) {
+                    await loadCountries();
+                } else {
+                    populateCountryDropdowns();
+                }
+                
+                const employee = await employeeAPI.getEmployeeById(id);
+                if (employee) {
+                    document.getElementById('editEmployeeId').value = employee.id;
+                    document.getElementById('editFirstName').value = employee.firstName;
+                    document.getElementById('editLastName').value = employee.lastName;
+                    document.getElementById('editEmail').value = employee.email;
+                    document.getElementById('editPhone').value = employee.phoneNumber || '';
+                    document.getElementById('editDepartment').value = employee.department || '';
+                    document.getElementById('editPosition').value = employee.position || '';
+                    document.getElementById('editCountry').value = employee.country || '';
+                    document.getElementById('editSalary').value = employee.salary || '';
+                    document.getElementById('editHireDate').value = employee.hireDate || '';
+                    document.getElementById('editJoinDate').value = employee.joinDate || '';
+                    document.getElementById('editRateCategory').value = employee.rateCategory || '';
+                    
+                    // Show current images
+                    if (employee.employeeImage) {
+                        document.getElementById('editEmployeeImageCurrent').style.display = 'block';
+                        document.querySelector('#editEmployeeImageCurrent img').src = employee.employeeImage;
+                        document.getElementById('editEmployeeImage').value = employee.employeeImage;
+                    }
+                    
+                    if (employee.image) {
+                        document.getElementById('editImageCurrent').style.display = 'block';
+                        document.querySelector('#editImageCurrent img').src = employee.image;
+                        document.getElementById('editImage').value = employee.image;
+                    }
+                    
+                    const modal = new bootstrap.Modal(document.getElementById('editEmployeeModal'));
+                    modal.show();
+                }
+            } catch (error) {
+                alert('Error loading employee: ' + error.message);
+            }
+        }
+
+        async function updateEmployee() {
+            const id = document.getElementById('editEmployeeId').value;
+            
+            try {
+                // Show loading state
+                const updateButton = document.querySelector('#editEmployeeModal .btn-primary');
+                updateButton.textContent = 'Updating...';
+                updateButton.disabled = true;
+
+                // Upload new images if selected
+                let employeeImageUrl = document.getElementById('editEmployeeImage').value; // Keep existing if no new upload
+                let profileImageUrl = document.getElementById('editImage').value; // Keep existing if no new upload
+
+                const employeeImageFile = document.getElementById('editEmployeeImageFile').files[0];
+                const profileImageFile = document.getElementById('editImageFile').files[0];
+
+                if (employeeImageFile) {
+                    const uploadResult = await fileUploadAPI.uploadImage(employeeImageFile);
+                    employeeImageUrl = uploadResult.url;
+                }
+
+                if (profileImageFile) {
+                    const uploadResult = await fileUploadAPI.uploadImage(profileImageFile);
+                    profileImageUrl = uploadResult.url;
+                }
+
+                // Create employee data
+                const employeeData = {
+                    firstName: document.getElementById('editFirstName').value,
+                    lastName: document.getElementById('editLastName').value,
+                    email: document.getElementById('editEmail').value,
+                    phoneNumber: document.getElementById('editPhone').value,
+                    department: document.getElementById('editDepartment').value,
+                    position: document.getElementById('editPosition').value,
+                    country: document.getElementById('editCountry').value,
+                    salary: parseFloat(document.getElementById('editSalary').value) || null,
+                    hireDate: document.getElementById('editHireDate').value || null,
+                    joinDate: document.getElementById('editJoinDate').value || null,
+                    rateCategory: document.getElementById('editRateCategory').value,
+                    employeeImage: employeeImageUrl,
+                    image: profileImageUrl
+                };
+
+                await employeeAPI.updateEmployee(id, employeeData);
+                bootstrap.Modal.getInstance(document.getElementById('editEmployeeModal')).hide();
+                loadEmployeeData();
+                alert('Employee updated successfully!');
+
+            } catch (error) {
+                alert('Error updating employee: ' + error.message);
+            } finally {
+                // Reset button state
+                const updateButton = document.querySelector('#editEmployeeModal .btn-primary');
+                updateButton.textContent = 'Update Employee';
+                updateButton.disabled = false;
+            }
+        }
+
+        async function deleteEmployee(id) {
+            if (confirm('Are you sure you want to delete this employee?')) {
+                try {
+                    await employeeAPI.deleteEmployee(id);
+                    loadEmployeeData();
+                    alert('Employee deleted successfully!');
+                } catch (error) {
+                    alert('Error deleting employee: ' + error.message);
+                }
+            }
+        }
+
+        async function searchEmployees() {
+            const searchTerm = document.getElementById('searchEmployee').value.trim();
+            if (searchTerm) {
+                try {
+                    const employees = await employeeAPI.searchByName(searchTerm);
+                    displayEmployees(employees);
+                } catch (error) {
+                    console.error('Error searching employees:', error);
+                }
+            } else {
+                loadEmployeeData();
+            }
+        }
+
+        async function filterByDepartment() {
+            const department = document.getElementById('filterDepartment').value;
+            if (department) {
+                try {
+                    const employees = await employeeAPI.getByDepartment(department);
+                    displayEmployees(employees);
+                } catch (error) {
+                    console.error('Error filtering by department:', error);
+                }
+            } else {
+                loadEmployeeData();
+            }
+        }
+
+        // Image preview functionality
+        function previewImage(input, previewId) {
+            const file = input.files[0];
+            const previewDiv = document.getElementById(previewId);
+            const img = previewDiv.querySelector('img');
+
+            if (file) {
+                // Validate file type
+                if (!file.type.startsWith('image/')) {
+                    alert('Please select a valid image file.');
+                    input.value = '';
+                    previewDiv.style.display = 'none';
+                    return;
+                }
+
+                // Validate file size (5MB)
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('File size must be less than 5MB.');
+                    input.value = '';
+                    previewDiv.style.display = 'none';
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    img.src = e.target.result;
+                    previewDiv.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            } else {
+                previewDiv.style.display = 'none';
+            }
+        }
+
+        // Clear add employee form
+        function clearAddEmployeeForm() {
+            document.getElementById('addEmployeeForm').reset();
+            
+            // Clear image previews
+            document.getElementById('addEmployeeImagePreview').style.display = 'none';
+            document.getElementById('addImagePreview').style.display = 'none';
+            
+            // Clear hidden image URLs
+            document.getElementById('addEmployeeImage').value = '';
+            document.getElementById('addImage').value = '';
+        }
+
+        // Clear edit employee form
+        function clearEditEmployeeForm() {
+            document.getElementById('editEmployeeForm').reset();
+            
+            // Clear image previews and current images
+            document.getElementById('editEmployeeImagePreview').style.display = 'none';
+            document.getElementById('editImagePreview').style.display = 'none';
+            document.getElementById('editEmployeeImageCurrent').style.display = 'none';
+            document.getElementById('editImageCurrent').style.display = 'none';
+            
+            // Clear hidden image URLs
+            document.getElementById('editEmployeeImage').value = '';
+            document.getElementById('editImage').value = '';
+        }
+    </script>
+</body>
+</html>

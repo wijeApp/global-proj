@@ -1,0 +1,472 @@
+package com.tas.global.globalven.controller;
+
+import com.tas.global.globalven.dto.GlRefCodeDto;
+import com.tas.global.globalven.service.GlRefCodeService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+@RestController
+@RequestMapping("/api/test")
+@CrossOrigin(origins = "*")
+public class DatabaseTestController {
+
+    // @Autowired
+    // @Qualifier("sqlServerJdbcTemplate")
+    // private JdbcTemplate sqlServerJdbcTemplate;
+
+    // @Autowired
+    // @Qualifier("primaryJdbcTemplate")
+    // private JdbcTemplate primaryJdbcTemplate;
+
+    // @Autowired
+    // @Qualifier("sqlServerDataSource")
+    // private DataSource sqlServerDataSource;
+
+    // @Autowired
+    // @Qualifier("primaryDataSource")
+    // private DataSource primaryDataSource;
+
+    // @Autowired
+    // private GlRefCodeService glRefCodeService;
+
+    /**
+     * Simple health check endpoint
+     */
+    @GetMapping("/health")
+    public ResponseEntity<Map<String, String>> healthCheck() {
+        Map<String, String> result = new HashMap<>();
+        result.put("status", "SUCCESS");
+        result.put("message", "Application is running");
+        result.put("timestamp", java.time.LocalDateTime.now().toString());
+        return ResponseEntity.ok(result);
+    }
+
+    /**
+     * Test SQL Server connection - TEMPORARILY DISABLED
+     */
+    // @GetMapping("/sqlserver-connection")
+    // @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
+    public ResponseEntity<Map<String, Object>> testSqlServerConnection() {
+        Map<String, Object> result = new HashMap<>();
+        
+        try (Connection connection = sqlServerDataSource.getConnection()) {
+            DatabaseMetaData metaData = connection.getMetaData();
+            
+            result.put("status", "SUCCESS");
+            result.put("connected", true);
+            result.put("databaseProductName", metaData.getDatabaseProductName());
+            result.put("databaseProductVersion", metaData.getDatabaseProductVersion());
+            result.put("driverName", metaData.getDriverName());
+            result.put("driverVersion", metaData.getDriverVersion());
+            result.put("url", metaData.getURL());
+            result.put("username", metaData.getUserName());
+            result.put("catalogName", connection.getCatalog());
+            result.put("autoCommit", connection.getAutoCommit());
+            result.put("readOnly", connection.isReadOnly());
+            result.put("transactionIsolation", connection.getTransactionIsolation());
+            
+            return ResponseEntity.ok(result);
+            
+        } catch (SQLException e) {
+            result.put("status", "FAILED");
+            result.put("connected", false);
+            result.put("error", e.getMessage());
+            result.put("sqlState", e.getSQLState());
+            result.put("errorCode", e.getErrorCode());
+            
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(result);
+        }
+    }
+
+    /**
+     * Test MySQL connection
+     */
+    @GetMapping("/mysql-connection")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
+    public ResponseEntity<Map<String, Object>> testMySqlConnection() {
+        Map<String, Object> result = new HashMap<>();
+        
+        try (Connection connection = primaryDataSource.getConnection()) {
+            DatabaseMetaData metaData = connection.getMetaData();
+            
+            result.put("status", "SUCCESS");
+            result.put("connected", true);
+            result.put("databaseProductName", metaData.getDatabaseProductName());
+            result.put("databaseProductVersion", metaData.getDatabaseProductVersion());
+            result.put("driverName", metaData.getDriverName());
+            result.put("driverVersion", metaData.getDriverVersion());
+            result.put("url", metaData.getURL());
+            result.put("username", metaData.getUserName());
+            result.put("catalogName", connection.getCatalog());
+            
+            return ResponseEntity.ok(result);
+            
+        } catch (SQLException e) {
+            result.put("status", "FAILED");
+            result.put("connected", false);
+            result.put("error", e.getMessage());
+            result.put("sqlState", e.getSQLState());
+            result.put("errorCode", e.getErrorCode());
+            
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(result);
+        }
+    }
+
+    /**
+     * Test simple SQL Server query
+     */
+    @GetMapping("/sqlserver-query")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
+    public ResponseEntity<Map<String, Object>> testSqlServerQuery() {
+        Map<String, Object> result = new HashMap<>();
+        
+        try {
+            // Test basic query
+            String version = sqlServerJdbcTemplate.queryForObject("SELECT @@VERSION", String.class);
+            String currentTime = sqlServerJdbcTemplate.queryForObject("SELECT GETDATE()", String.class);
+            String databaseName = sqlServerJdbcTemplate.queryForObject("SELECT DB_NAME()", String.class);
+            
+            result.put("status", "SUCCESS");
+            result.put("version", version);
+            result.put("currentTime", currentTime);
+            result.put("databaseName", databaseName);
+            
+            return ResponseEntity.ok(result);
+            
+        } catch (Exception e) {
+            result.put("status", "FAILED");
+            result.put("error", e.getMessage());
+            result.put("errorType", e.getClass().getSimpleName());
+            
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(result);
+        }
+    }
+
+    /**
+     * Test stored procedure existence
+     */
+    @GetMapping("/stored-procedure-check")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
+    public ResponseEntity<Map<String, Object>> testStoredProcedureExists() {
+        Map<String, Object> result = new HashMap<>();
+        
+        try {
+            // Check if stored procedure exists
+            String query = """
+                SELECT COUNT(*) as proc_count 
+                FROM sys.procedures 
+                WHERE name = 'GET_GLREF_CODES'
+                """;
+            
+            Integer procCount = sqlServerJdbcTemplate.queryForObject(query, Integer.class);
+            
+            result.put("status", "SUCCESS");
+            result.put("storedProcedureExists", procCount > 0);
+            result.put("procedureCount", procCount);
+            
+            if (procCount > 0) {
+                // Get procedure details
+                String detailQuery = """
+                    SELECT 
+                        p.name,
+                        p.create_date,
+                        p.modify_date,
+                        m.definition
+                    FROM sys.procedures p
+                    LEFT JOIN sys.sql_modules m ON p.object_id = m.object_id
+                    WHERE p.name = 'GET_GLREF_CODES'
+                    """;
+                
+                Map<String, Object> procDetails = sqlServerJdbcTemplate.queryForMap(detailQuery);
+                result.put("procedureDetails", procDetails);
+            }
+            
+            return ResponseEntity.ok(result);
+            
+        } catch (Exception e) {
+            result.put("status", "FAILED");
+            result.put("error", e.getMessage());
+            result.put("errorType", e.getClass().getSimpleName());
+            
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(result);
+        }
+    }
+
+    /**
+     * Test GL reference codes API
+     */
+    @GetMapping("/glref-codes-api")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
+    public ResponseEntity<Map<String, Object>> testGlRefCodesApi() {
+        Map<String, Object> result = new HashMap<>();
+        
+        try {
+            long startTime = System.currentTimeMillis();
+            
+            // Test the service
+            List<GlRefCodeDto> glRefCodes = glRefCodeService.getAllGlRefCodes();
+            
+            long endTime = System.currentTimeMillis();
+            long executionTime = endTime - startTime;
+            
+            result.put("status", "SUCCESS");
+            result.put("recordCount", glRefCodes.size());
+            result.put("executionTimeMs", executionTime);
+            result.put("hasData", !glRefCodes.isEmpty());
+            
+            if (!glRefCodes.isEmpty()) {
+                // Show first few records as sample
+                List<GlRefCodeDto> sampleData = glRefCodes.stream()
+                        .limit(5)
+                        .toList();
+                result.put("sampleData", sampleData);
+                
+                // Statistics
+                long activeCount = glRefCodes.stream()
+                        .filter(code -> code.getIsActive() != null && code.getIsActive())
+                        .count();
+                
+                result.put("activeRecords", activeCount);
+                result.put("inactiveRecords", glRefCodes.size() - activeCount);
+                
+                // Categories
+                long categoryCount = glRefCodes.stream()
+                        .map(GlRefCodeDto::getCategory)
+                        .filter(category -> category != null && !category.trim().isEmpty())
+                        .distinct()
+                        .count();
+                
+                result.put("uniqueCategories", categoryCount);
+            }
+            
+            return ResponseEntity.ok(result);
+            
+        } catch (Exception e) {
+            result.put("status", "FAILED");
+            result.put("error", e.getMessage());
+            result.put("errorType", e.getClass().getSimpleName());
+            result.put("stackTrace", getStackTraceString(e));
+            
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(result);
+        }
+    }
+
+    /**
+     * Test all GL reference codes API methods
+     */
+    @GetMapping("/glref-codes-comprehensive")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
+    public ResponseEntity<Map<String, Object>> testGlRefCodesComprehensive() {
+        Map<String, Object> result = new HashMap<>();
+        Map<String, Object> tests = new HashMap<>();
+        
+        try {
+            // Test 1: Get all GL codes
+            try {
+                List<GlRefCodeDto> allCodes = glRefCodeService.getAllGlRefCodes();
+                tests.put("getAllGlRefCodes", Map.of(
+                    "status", "SUCCESS",
+                    "recordCount", allCodes.size()
+                ));
+            } catch (Exception e) {
+                tests.put("getAllGlRefCodes", Map.of(
+                    "status", "FAILED",
+                    "error", e.getMessage()
+                ));
+            }
+
+            // Test 2: Get active GL codes
+            try {
+                List<GlRefCodeDto> activeCodes = glRefCodeService.getActiveGlRefCodes();
+                tests.put("getActiveGlRefCodes", Map.of(
+                    "status", "SUCCESS",
+                    "recordCount", activeCodes.size()
+                ));
+            } catch (Exception e) {
+                tests.put("getActiveGlRefCodes", Map.of(
+                    "status", "FAILED",
+                    "error", e.getMessage()
+                ));
+            }
+
+            // Test 3: Get categories
+            try {
+                List<String> categories = glRefCodeService.getAllCategories();
+                tests.put("getAllCategories", Map.of(
+                    "status", "SUCCESS",
+                    "categoryCount", categories.size(),
+                    "categories", categories
+                ));
+            } catch (Exception e) {
+                tests.put("getAllCategories", Map.of(
+                    "status", "FAILED",
+                    "error", e.getMessage()
+                ));
+            }
+
+            // Test 4: Search functionality
+            try {
+                List<GlRefCodeDto> searchResults = glRefCodeService.searchGlRefCodes("GL");
+                tests.put("searchGlRefCodes", Map.of(
+                    "status", "SUCCESS",
+                    "searchTerm", "GL",
+                    "resultCount", searchResults.size()
+                ));
+            } catch (Exception e) {
+                tests.put("searchGlRefCodes", Map.of(
+                    "status", "FAILED",
+                    "error", e.getMessage()
+                ));
+            }
+
+            // Test 5: Statistics
+            try {
+                long totalCount = glRefCodeService.getTotalGlRefCodeCount();
+                long activeCount = glRefCodeService.getActiveGlRefCodeCount();
+                
+                tests.put("getStatistics", Map.of(
+                    "status", "SUCCESS",
+                    "totalCount", totalCount,
+                    "activeCount", activeCount,
+                    "inactiveCount", totalCount - activeCount
+                ));
+            } catch (Exception e) {
+                tests.put("getStatistics", Map.of(
+                    "status", "FAILED",
+                    "error", e.getMessage()
+                ));
+            }
+
+            result.put("overallStatus", "COMPLETED");
+            result.put("tests", tests);
+            
+            // Calculate success rate
+            long successfulTests = tests.values().stream()
+                    .mapToLong(test -> {
+                        if (test instanceof Map) {
+                            Map<?, ?> testMap = (Map<?, ?>) test;
+                            return "SUCCESS".equals(testMap.get("status")) ? 1 : 0;
+                        }
+                        return 0;
+                    })
+                    .sum();
+            
+            result.put("successRate", String.format("%.1f%%", (successfulTests * 100.0) / tests.size()));
+            result.put("successfulTests", successfulTests);
+            result.put("totalTests", tests.size());
+            
+            return ResponseEntity.ok(result);
+            
+        } catch (Exception e) {
+            result.put("overallStatus", "FAILED");
+            result.put("error", e.getMessage());
+            result.put("tests", tests);
+            
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(result);
+        }
+    }
+
+    /**
+     * Direct stored procedure execution test
+     */
+    @GetMapping("/direct-stored-procedure")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
+    public ResponseEntity<Map<String, Object>> testDirectStoredProcedure() {
+        Map<String, Object> result = new HashMap<>();
+        
+        try {
+            long startTime = System.currentTimeMillis();
+            
+            // Direct SQL execution
+            String sql = "EXEC GET_GLREF_CODES";
+            List<Map<String, Object>> rows = sqlServerJdbcTemplate.queryForList(sql);
+            
+            long endTime = System.currentTimeMillis();
+            long executionTime = endTime - startTime;
+            
+            result.put("status", "SUCCESS");
+            result.put("recordCount", rows.size());
+            result.put("executionTimeMs", executionTime);
+            result.put("hasData", !rows.isEmpty());
+            
+            if (!rows.isEmpty()) {
+                // Show column information from first row
+                Map<String, Object> firstRow = rows.get(0);
+                result.put("columns", firstRow.keySet());
+                result.put("sampleRow", firstRow);
+                
+                // Show first few rows
+                List<Map<String, Object>> sampleRows = rows.stream()
+                        .limit(3)
+                        .toList();
+                result.put("sampleData", sampleRows);
+            }
+            
+            return ResponseEntity.ok(result);
+            
+        } catch (Exception e) {
+            result.put("status", "FAILED");
+            result.put("error", e.getMessage());
+            result.put("errorType", e.getClass().getSimpleName());
+            result.put("stackTrace", getStackTraceString(e));
+            
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(result);
+        }
+    }
+
+    /**
+     * Get connection pool information
+     */
+    @GetMapping("/connection-info")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
+    public ResponseEntity<Map<String, Object>> getConnectionInfo() {
+        Map<String, Object> result = new HashMap<>();
+        
+        try {
+            // SQL Server connection info
+            Map<String, Object> sqlServerInfo = new HashMap<>();
+            sqlServerInfo.put("dataSourceClass", sqlServerDataSource.getClass().getSimpleName());
+            sqlServerInfo.put("jdbcTemplateClass", sqlServerJdbcTemplate.getClass().getSimpleName());
+            
+            // Primary connection info
+            Map<String, Object> primaryInfo = new HashMap<>();
+            primaryInfo.put("dataSourceClass", primaryDataSource.getClass().getSimpleName());
+            primaryInfo.put("jdbcTemplateClass", primaryJdbcTemplate.getClass().getSimpleName());
+            
+            result.put("sqlServer", sqlServerInfo);
+            result.put("primary", primaryInfo);
+            result.put("status", "SUCCESS");
+            
+            return ResponseEntity.ok(result);
+            
+        } catch (Exception e) {
+            result.put("status", "FAILED");
+            result.put("error", e.getMessage());
+            
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(result);
+        }
+    }
+
+    /**
+     * Utility method to get stack trace as string
+     */
+    private String getStackTraceString(Exception e) {
+        java.io.StringWriter sw = new java.io.StringWriter();
+        java.io.PrintWriter pw = new java.io.PrintWriter(sw);
+        e.printStackTrace(pw);
+        return sw.toString();
+    }
+}

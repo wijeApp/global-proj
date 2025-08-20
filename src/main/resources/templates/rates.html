@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rates - GlobalVen</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <!-- Navigation Menu -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-building"></i> GlobalVen
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">
+                            <i class="bi bi-house-door"></i> Home
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/employees">
+                            <i class="bi bi-people"></i> Employees
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle active" href="#" id="masterSettingsDropdown" role="button" 
+                           data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-gear"></i> Master Settings
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="masterSettingsDropdown">
+                            <li>
+                                <a class="dropdown-item" href="/employees">
+                                    <i class="bi bi-people"></i> Employees
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item" href="/categories">
+                                    <i class="bi bi-tags"></i> Categories
+                                </a>
+                            </li>                            <li>
+                                <a class="dropdown-item active" href="/rates">
+                                    <i class="bi bi-speedometer2"></i> Rates
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item" href="/departments">
+                                    <i class="bi bi-building"></i> Departments
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="/positions">
+                                    <i class="bi bi-briefcase"></i> Positions
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item" href="/system-settings">
+                                    <i class="bi bi-sliders"></i> System Settings
+                                </a>
+                            </li>
+                        </ul>                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="transactionsDropdown" role="button" 
+                           data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-receipt"></i> Transactions
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="transactionsDropdown">
+                            <li>
+                                <a class="dropdown-item" href="/transactions">
+                                    <i class="bi bi-receipt-cutoff"></i> Manage Transfers
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item" href="/expenses">
+                                    <i class="bi bi-credit-card"></i> Manage Expenses
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="/reports">
+                                    <i class="bi bi-graph-up"></i> Transaction Reports
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/about">
+                            <i class="bi bi-info-circle"></i> About
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>    <!-- Page Header -->
+    <div class="page-header">
+        <div class="container">
+            <h1><i class="bi bi-speedometer2"></i> Rates Management</h1>
+            <p class="lead">Manage employee pay rates and compensation</p>
+        </div>
+    </div>
+
+    <!-- Content Section -->
+    <section class="content-section">
+        <div class="container">
+            <!-- Rate Stats Cards -->
+            <div class="row mb-4">                <div class="col-md-3">
+                    <div class="card bg-primary-light">
+                        <div class="card-body">
+                            <h6 class="text-primary">Average Rate</h6>
+                            <h3 class="mb-0" id="averageRate">0.00/hr</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-success-light">
+                        <div class="card-body">
+                            <h6 class="text-success">Highest Rate</h6>
+                            <h3 class="mb-0" id="highestRate">0.00/hr</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-info-light">
+                        <div class="card-body">
+                            <h6 class="text-info">Lowest Rate</h6>
+                            <h3 class="mb-0" id="lowestRate">0.00/hr</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-warning-light">
+                        <div class="card-body">
+                            <h6 class="text-warning">Total Rates</h6>
+                            <h3 class="mb-0" id="totalRateCount">0</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Search and Controls -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Search rates by keyword..." id="searchRate" onkeyup="searchRates()">
+                        <select class="form-select" id="categoryFilter" style="max-width: 200px;" onchange="searchRates()">
+                            <option value="">All Categories</option>
+                            <!-- Categories will be loaded dynamically -->
+                        </select>
+                        <button class="btn btn-outline-secondary" onclick="searchRates()">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-6 text-end">
+                    <button class="btn btn-info" onclick="showAddRateModal()">
+                        <i class="bi bi-cash-stack"></i> Add New Rate
+                    </button>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Employee Category</th>
+                                    <th>Rate Name</th>
+                                    <th>Rate Amount</th>
+                                    <th>Currency</th>
+                                    <th>Rate Type</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>                            <tbody id="rate-table-body">
+                                <tr>
+                                    <td colspan="8" class="text-center">
+                                        <div class="spinner-border text-primary" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Add Rate Modal -->
+    <div class="modal fade" id="addRateModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add New Rate</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">                    <form id="addRateForm">                        <div class="mb-3">
+                            <label class="form-label">Employee Category</label>
+                            <select class="form-select" id="addEmpCategory" required>
+                                <option value="">Select Category</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Rate Name</label>
+                            <input type="text" class="form-control" id="addRateName" placeholder="Enter rate name" required>
+                        </div>                        <div class="mb-3">
+                            <label class="form-label">Rate Amount</label>
+                            <input type="number" class="form-control" id="addRateAmount" step="0.01" min="0" required>
+                        </div>
+                        <div class="row">                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Currency</label>
+                                <select class="form-select" id="addCurrency">
+                                    <option value="USD">USD</option>
+                                    <option value="EUR">EUR</option>
+                                    <option value="GBP">GBP</option>
+                                    <option value="INR">INR</option>
+                                    <option value="AUD">AUD</option>
+                                    <option value="LKR">LKR</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Rate Type</label>
+                                <select class="form-select" id="addRateType">
+                                    <option value="hourly">Hourly</option>
+                                    <option value="daily">Daily</option>
+                                    <option value="monthly">Monthly</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="addIsActive" checked>
+                            <label class="form-check-label" for="addIsActive">Active</label>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-info" onclick="addRate()">Add Rate</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Rate Modal -->
+    <div class="modal fade" id="editRateModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Rate</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editRateForm">
+                        <input type="hidden" id="editRateId">                        <div class="mb-3">
+                            <label class="form-label">Employee Category</label>
+                            <select class="form-select" id="editEmpCategory" required>
+                                <option value="">Select Category</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Rate Name</label>
+                            <input type="text" class="form-control" id="editRateName" placeholder="Enter rate name" required>
+                        </div>                        <div class="mb-3">
+                            <label class="form-label">Rate Amount</label>
+                            <input type="number" class="form-control" id="editRateAmount" step="0.01" min="0" required>
+                        </div>
+                        <div class="row">                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Currency</label>
+                                <select class="form-select" id="editCurrency">
+                                    <option value="USD">USD</option>
+                                    <option value="EUR">EUR</option>
+                                    <option value="GBP">GBP</option>
+                                    <option value="INR">INR</option>
+                                    <option value="AUD">AUD</option>
+                                    <option value="LKR">LKR</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Rate Type</label>
+                                <select class="form-select" id="editRateType">
+                                    <option value="hourly">Hourly</option>
+                                    <option value="daily">Daily</option>
+                                    <option value="monthly">Monthly</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="editIsActive">
+                            <label class="form-check-label" for="editIsActive">Active</label>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="updateRate()">Update Rate</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-4 mt-5">
+        <div class="container text-center">
+            <p class="mb-0">&copy; 2024 GlobalVen. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Rate Management JavaScript -->
+    <script>
+        // Rate API Service
+        class RateAPI {
+            constructor() {
+                this.baseUrl = '/api/rates';
+            }
+
+            async getAllRates() {
+                try {
+                    const response = await fetch(this.baseUrl);
+                    if (!response.ok) throw new Error('Failed to fetch rates');
+                    return await response.json();
+                } catch (error) {
+                    console.error('Error fetching rates:', error);
+                    return [];
+                }
+            }
+
+            async getRateById(id) {
+                try {
+                    const response = await fetch(`${this.baseUrl}/${id}`);
+                    if (!response.ok) throw new Error('Rate not found');
+                    return await response.json();
+                } catch (error) {
+                    console.error('Error fetching rate:', error);
+                    return null;
+                }
+            }
+
+            async createRate(rateData) {
+                try {
+                    const response = await fetch(this.baseUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(rateData)
+                    });
+                    if (!response.ok) throw new Error('Failed to create rate');
+                    return await response.json();
+                } catch (error) {
+                    console.error('Error creating rate:', error);
+                    throw error;
+                }
+            }
+
+            async updateRate(id, rateData) {
+                try {
+                    const response = await fetch(`${this.baseUrl}/${id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(rateData)
+                    });
+                    if (!response.ok) throw new Error('Failed to update rate');
+                    return await response.json();
+                } catch (error) {
+                    console.error('Error updating rate:', error);
+                    throw error;
+                }
+            }
+
+            async deleteRate(id) {
+                try {
+                    const response = await fetch(`${this.baseUrl}/${id}`, { method: 'DELETE' });
+                    if (!response.ok) throw new Error('Failed to delete rate');
+                    return true;
+                } catch (error) {
+                    console.error('Error deleting rate:', error);
+                    throw error;
+                }
+            }
+
+            async toggleRateStatus(id, active) {
+                try {
+                    const response = await fetch(`${this.baseUrl}/${id}/toggle-status?active=${active}`, {
+                        method: 'PATCH'
+                    });
+                    if (!response.ok) throw new Error('Failed to update status');
+                    return await response.json();
+                } catch (error) {
+                    console.error('Error toggling status:', error);
+                    throw error;
+                }
+            }
+
+            async searchRatesByCategory(category) {
+                try {
+                    const response = await fetch(`${this.baseUrl}/search?category=${encodeURIComponent(category)}`);
+                    if (!response.ok) throw new Error('Search failed');
+                    return await response.json();
+                } catch (error) {
+                    console.error('Error searching rates:', error);
+                    return [];
+                }
+            }
+
+            async getRateCounts() {
+                try {
+                    const response = await fetch(`${this.baseUrl}/counts`);
+                    if (!response.ok) throw new Error('Failed to fetch counts');
+                    return await response.json();
+                } catch (error) {
+                    console.error('Error fetching counts:', error);
+                    return { total: 0, active: 0, inactive: 0 };
+                }
+            }
+            
+            async getRateStatistics() {
+                try {
+                    const response = await fetch(`${this.baseUrl}/statistics`);
+                    if (!response.ok) throw new Error('Failed to fetch statistics');
+                    return await response.json();
+                } catch (error) {
+                    console.error('Error fetching statistics:', error);
+                    return { highest: 0, lowest: 0, average: 0 };
+                }
+            }        }
+
+        // Category API Service
+        class CategoryAPI {
+            constructor() {
+                this.baseUrl = '/api/categories';
+            }
+
+            async getAllCategories() {
+                try {
+                    const response = await fetch(this.baseUrl);
+                    if (!response.ok) throw new Error('Failed to fetch categories');
+                    return await response.json();
+                } catch (error) {
+                    console.error('Error fetching categories:', error);
+                    return [];
+                }
+            }
+
+            async getActiveCategories() {
+                try {
+                    const response = await fetch(`${this.baseUrl}/active`);
+                    if (!response.ok) throw new Error('Failed to fetch active categories');
+                    return await response.json();
+                } catch (error) {
+                    console.error('Error fetching active categories:', error);
+                    return [];
+                }
+            }
+        }        // Initialize APIs
+        const rateAPI = new RateAPI();
+        const categoryAPI = new CategoryAPI();
+
+        // Load categories into dropdown
+        async function loadCategories(selectElementId, selectedCategoryName = null) {
+            try {
+                const categories = await categoryAPI.getActiveCategories();
+                const selectElement = document.getElementById(selectElementId);
+                
+                // Clear existing options except the first one
+                selectElement.innerHTML = '<option value="">Select Category</option>';
+                
+                // Add category options
+                categories.forEach(category => {
+                    const option = document.createElement('option');
+                    option.value = category.id;
+                    option.textContent = category.catName;
+                    if (selectedCategoryName && category.catName === selectedCategoryName) {
+                        option.selected = true;
+                    }
+                    selectElement.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error loading categories:', error);
+            }
+        }
+        
+        async function loadCategoryFilterOptions() {
+            try {
+                const categories = await categoryAPI.getActiveCategories();
+                const selectElement = document.getElementById('categoryFilter');
+                
+                // Clear existing options except the first one
+                selectElement.innerHTML = '<option value="">All Categories</option>';
+                
+                // Add category options
+                categories.forEach(category => {
+                    const option = document.createElement('option');
+                    option.value = category.catName;
+                    option.textContent = category.catName;
+                    selectElement.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error loading category filter options:', error);
+            }
+        }
+
+        // Load data on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadRateData();
+            loadRateStatistics();
+            loadCategoryFilterOptions();
+        });
+
+        async function loadRateData() {
+            try {
+                const rates = await rateAPI.getAllRates();
+                displayRates(rates);
+                updateRateCount(rates.length);            } catch (error) {
+                console.error('Error loading rates:', error);
+                document.getElementById('rate-table-body').innerHTML = 
+                    '<tr><td colspan="8" class="text-center text-danger">Error loading rates</td></tr>';
+            }
+        }
+
+        async function loadRateStatistics() {
+            try {
+                const stats = await rateAPI.getRateStatistics();
+                document.getElementById('averageRate').textContent = formatCurrency(stats.average) + getTypeSuffix('hourly');
+                document.getElementById('highestRate').textContent = formatCurrency(stats.highest) + getTypeSuffix('hourly');
+                document.getElementById('lowestRate').textContent = formatCurrency(stats.lowest) + getTypeSuffix('hourly');
+                
+                const counts = await rateAPI.getRateCounts();
+                document.getElementById('totalRateCount').textContent = counts.total;
+            } catch (error) {
+                console.error('Error loading rate statistics:', error);
+            }
+        }
+        
+        function updateRateCount(count) {
+            document.getElementById('totalRateCount').textContent = count;
+        }
+
+        function displayRates(rates) {
+            const tbody = document.getElementById('rate-table-body');
+            if (!tbody) return;            if (rates.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" class="text-center">No rates found</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = rates.map(rate => `
+                <tr>
+                    <td>${rate.id}</td>
+                    <td>
+                        <span class="badge ${rate.isActive ? 'bg-primary' : 'bg-secondary'}">
+                            ${rate.empCategory}
+                        </span>
+                    </td>
+                    <td>${rate.rateName || 'N/A'}</td>
+                    <td><strong>${formatCurrency(rate.rateAmount)}</strong>${getTypeSuffix(rate.rateType)}</td>
+                    <td>${rate.currency}</td>
+                    <td>${capitalizeFirstLetter(rate.rateType)}</td>
+                    <td>
+                        <span class="badge ${rate.isActive ? 'bg-success' : 'bg-danger'}">
+                            ${rate.isActive ? 'Active' : 'Inactive'}
+                        </span>
+                    </td>
+                    <td>
+                        <button class="btn btn-sm btn-info" onclick="toggleStatus(${rate.id}, ${!rate.isActive})" title="${rate.isActive ? 'Deactivate' : 'Activate'}">
+                            <i class="bi ${rate.isActive ? 'bi-toggle-on' : 'bi-toggle-off'}"></i>
+                        </button>
+                        <button class="btn btn-sm btn-warning" onclick="editRate(${rate.id})" title="Edit">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteRate(${rate.id})" title="Delete">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }        function formatCurrency(amount) {
+            if (amount === null || amount === undefined) return '0.00';
+            return parseFloat(amount).toFixed(2);
+        }
+        
+        function getTypeSuffix(rateType) {
+            switch(rateType) {
+                case 'hourly': return '/hr';
+                case 'daily': return '/day';
+                case 'monthly': return '/month';
+                default: return '';
+            }
+        }
+        
+        function capitalizeFirstLetter(string) {
+            if (!string) return '';
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        }        async function showAddRateModal() {
+            document.getElementById('addRateForm').reset();
+            await loadCategories('addEmpCategory');
+            const modal = new bootstrap.Modal(document.getElementById('addRateModal'));
+            modal.show();
+        }        async function addRate() {
+            const empCategorySelect = document.getElementById('addEmpCategory');
+            const selectedOption = empCategorySelect.options[empCategorySelect.selectedIndex];
+            
+            const rateData = {
+                empCategory: selectedOption.textContent, // Use category name instead of ID
+                rateName: document.getElementById('addRateName').value,
+                rateAmount: parseFloat(document.getElementById('addRateAmount').value),
+                currency: document.getElementById('addCurrency').value,
+                rateType: document.getElementById('addRateType').value,
+                isActive: document.getElementById('addIsActive').checked
+            };
+
+            try {
+                await rateAPI.createRate(rateData);
+                bootstrap.Modal.getInstance(document.getElementById('addRateModal')).hide();
+                loadRateData();
+                loadRateStatistics();
+                alert('Rate added successfully!');
+            } catch (error) {
+                alert('Error adding rate: ' + error.message);
+            }
+        }
+
+        async function editRate(id) {
+            try {
+                const rate = await rateAPI.getRateById(id);                if (rate) {
+                    document.getElementById('editRateId').value = rate.id;
+                    await loadCategories('editEmpCategory', rate.empCategory);
+                    document.getElementById('editRateName').value = rate.rateName || '';
+                    document.getElementById('editRateAmount').value = rate.rateAmount;
+                    document.getElementById('editCurrency').value = rate.currency;
+                    document.getElementById('editRateType').value = rate.rateType;
+                    document.getElementById('editIsActive').checked = rate.isActive;
+                    
+                    const modal = new bootstrap.Modal(document.getElementById('editRateModal'));
+                    modal.show();
+                }
+            } catch (error) {
+                alert('Error loading rate: ' + error.message);
+            }
+        }
+
+        async function updateRate() {
+            const id = document.getElementById('editRateId').value;
+            const empCategorySelect = document.getElementById('editEmpCategory');
+            const selectedOption = empCategorySelect.options[empCategorySelect.selectedIndex];
+              const rateData = {
+                empCategory: selectedOption.textContent, // Use category name instead of ID
+                rateName: document.getElementById('editRateName').value,
+                rateAmount: parseFloat(document.getElementById('editRateAmount').value),
+                currency: document.getElementById('editCurrency').value,
+                rateType: document.getElementById('editRateType').value,
+                isActive: document.getElementById('editIsActive').checked
+            };
+
+            try {
+                await rateAPI.updateRate(id, rateData);
+                bootstrap.Modal.getInstance(document.getElementById('editRateModal')).hide();
+                loadRateData();
+                loadRateStatistics();
+                alert('Rate updated successfully!');
+            } catch (error) {
+                alert('Error updating rate: ' + error.message);
+            }
+        }
+
+        async function toggleStatus(id, active) {
+            try {
+                await rateAPI.toggleRateStatus(id, active);
+                loadRateData();
+                loadRateStatistics();
+            } catch (error) {
+                alert('Error toggling status: ' + error.message);
+            }
+        }
+
+        async function deleteRate(id) {
+            if (confirm('Are you sure you want to delete this rate?')) {
+                try {
+                    await rateAPI.deleteRate(id);
+                    loadRateData();
+                    loadRateStatistics();
+                    alert('Rate deleted successfully!');
+                } catch (error) {
+                    alert('Error deleting rate: ' + error.message);
+                }
+            }
+        }
+
+        async function searchRates() {
+            const searchTerm = document.getElementById('searchRate').value.trim();
+            const selectedCategory = document.getElementById('categoryFilter').value;
+            
+            try {
+                let rates;
+                
+                if (searchTerm || selectedCategory) {
+                    // If we have a search term, use the search API
+                    rates = await rateAPI.searchRatesByCategory(searchTerm);
+                    
+                    // If a category is selected, filter the results further
+                    if (selectedCategory) {
+                        rates = rates.filter(rate => rate.empCategory === selectedCategory);
+                    }
+                } else {
+                    // If no search criteria, load all rates
+                    rates = await rateAPI.getAllRates();
+                }
+                
+                displayRates(rates);
+            } catch (error) {
+                console.error('Error searching rates:', error);
+            }
+        }
+    </script>
+</body>
+</html>
