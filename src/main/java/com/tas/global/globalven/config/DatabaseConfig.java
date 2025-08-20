@@ -19,9 +19,9 @@ public class DatabaseConfig {
     @Primary
     public DataSource mysqlDataSource() {
         return DataSourceBuilder.create()
-                .url("jdbc:mysql://centerbeam.proxy.rlwy.net:44701/globalschema?useSSL=false&serverTimezone=UTC&createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8")
+                .url("jdbc:mysql://shortline.proxy.rlwy.net:30481/globalschema?useSSL=false&serverTimezone=UTC&createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8")
                 .username("root")
-                .password("nRVPeDdzWcGLkBTOmgsndBJhwZCGrjuP")
+                .password("TvWBneTFotjOYGjediHZiBzLGDdBnaiP")
                 .driverClassName("com.mysql.cj.jdbc.Driver")
                 .build();
     }
